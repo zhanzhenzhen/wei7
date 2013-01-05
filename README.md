@@ -6,10 +6,9 @@ wei7 (wei7.com)
 怎样生成
 ----
 
-如要成功生成，必须确保本地计算机中已安装有：
+如要成功生成，必须确保满足下列条件：
 
-- node.js
-- CoffeeScript
+- 已安装CoffeeScript （注意：CoffeeScript依赖node.js，所以必须先安装node.js。然后使用npm安装CoffeeScript。CoffeeScript必须以全局模式安装。）
 
 首先，使当前目录为该项目的目录，例如：
 
