@@ -6,5 +6,14 @@ wei7 (wei7.com)
 怎样生成
 ----
 
-首先，使当前目录为该项目的目录，例如~/projects/wei7。
-然后，输入cake build。
+首先，使当前目录为该项目的目录，例如：
+
+```bash
+cd ~/projects/wei7
+```
+
+然后，输入：
+
+```bash
+cake build
+```
