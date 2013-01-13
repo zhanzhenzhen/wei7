@@ -18,7 +18,22 @@ httpModule.createServer((request, response) ->
                                 <title>403 forbidden</title>
                             </head>
                             <body>
-                                wei7.com是一个关于围棋的应用。您的浏览器太旧了。我们支持几乎所有的主流浏览器，唯独不支持IE 6/7/8/9。建议至少使用IE 10，或者其他品牌非IE内核的浏览器。
+                                <p>
+                                    wei7.com是一个有关围棋的应用。本应用是为了对现有的中文围棋应用作适当的补充，使移动平台和最新桌面平台能够提供统一和优质的围棋体验。
+                                </p>
+                                <p>
+                                    对不起，您的浏览器太旧了，访问被禁止。本应用使用的某些新技术并不支持IE 6/7/8/9。建议至少使用IE 10，或者其他品牌非IE内核的浏览器。
+                                </p>
+                                <p>
+                                    IE 10: 支持。<br />
+                                    Chrome: 支持。<br />
+                                    Firefox: 支持。<br />
+                                    Safari: 支持。<br />
+                                    iPad: 支持。<br />
+                                    iPhone: 支持。<br />
+                                    Android 4.0 Chrome: 支持。<br />
+                                    Windows Phone 8: 支持。
+                                </p>
                             </body>
                         </html>
                     """)
@@ -38,6 +53,12 @@ httpModule.createServer((request, response) ->
                 fsModule.readFile("client.js", (error, data) ->
                     checkError(error)
                     response.writeHead(200, {"Content-Type": "application/javascript"})
+                    response.end(data)
+                )
+            when "/wood.jpg"
+                fsModule.readFile("wood.jpg", (error, data) ->
+                    checkError(error)
+                    response.writeHead(200, {"Content-Type": "image/jpeg"})
                     response.end(data)
                 )
             else
