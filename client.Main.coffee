@@ -9,8 +9,9 @@ codifyElement = (object, elementString) ->
         handle(m)
 ui = {}
 codifyElement(ui, """
-    <g id="homeButton" transform="translate(-768,0)" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="0" cy="0" r="60" stroke="rgb(0,0,0)" stroke-width="30" fill="rgb(255,255,255)" />
+    <g id="homeButton" opacity="0.5" xmlns="http://www.w3.org/2000/svg">
+        <rect x="-48" y="-48" width="96" height="96" fill="rgb(255,0,0)" />
+        <circle r="20" fill="none" stroke="rgb(255,255,255)" stroke-width="8" />
     </g>
 """)
 codifyElement(ui, """
@@ -22,10 +23,10 @@ codifyElement(ui, """
 """)
 codifyElement(ui, """
     <radialGradient id="blackStoneGradient" r="0.5" xmlns="http://www.w3.org/2000/svg">
-        <stop offset="0" stop-color="rgb(92,92,100)" />
-        <stop offset="0.31" stop-color="rgb(82,82,90)" />
-        <stop offset="0.62" stop-color="rgb(68,68,76)" />
-        <stop offset="0.93" stop-color="rgb(48,48,56)" />
+        <stop offset="0" stop-color="rgb(82,82,90)" />
+        <stop offset="0.333" stop-color="rgb(74,74,82)" />
+        <stop offset="0.667" stop-color="rgb(62,62,70)" />
+        <stop offset="1" stop-color="rgb(44,44,52)" />
     </radialGradient>
 """)
 codifyElement(ui, """
@@ -39,14 +40,55 @@ codifyElement(ui, """
 """)
 codifyElement(ui, """
     <symbol id="blackStone" viewBox="-64 -64 128 128" overflow="visible" xmlns="http://www.w3.org/2000/svg">
-        <circle r="64" fill="url(#blackStoneGradient)" />
+        <circle r="64" fill="rgb(128,128,136)" fill-opacity="0.625" stroke="rgb(48,48,56)" stroke-width="7" />
+        <circle r="56" fill="rgb(48,48,56)" />
     </symbol>
 """)
 codifyElement(ui, """
     <symbol id="whiteStone" viewBox="-64 -64 128 128" overflow="visible" xmlns="http://www.w3.org/2000/svg">
-        <circle r="64" fill="url(#whiteStoneGradient)" />
+        <circle r="64" fill="rgb(238,238,246)" stroke="rgb(128,128,136)" stroke-width="7" />
     </symbol>
 """)
+emptyElement = (element) -> element.textContent = ""
+getElementTranslates = (element) ->
+    transform = element.transform.baseVal
+    transform.getItem(i) for i in [0...transform.numberOfItems] \
+            when transform.getItem(i).type == SVGTransform.SVG_TRANSFORM_TRANSLATE
+# 返回元素的最后一个translate的值，如没有则返回(0,0)
+getElementTranslate = (element) ->
+    currentTranslates = getElementTranslates(element)
+    if currentTranslates.length == 0
+        new Point(0, 0)
+    else
+        matrix = currentTranslates[currentTranslates.length - 1].matrix
+        new Point(matrix.e, matrix.f)
+# 修改元素的最后一个translate的值，如没有则创建
+setElementTranslate = (element, value) ->
+    transform = element.transform.baseVal
+    currentTranslates = getElementTranslates(element)
+    translate =
+        if currentTranslates.length == 0
+            transform.appendItem(ui.root.createSVGTransform())
+            transform.getItem(transform.numberOfItems - 1)
+        else
+            currentTranslates[currentTranslates.length - 1]
+    translate.setTranslate(value.x, value.y)
+class Point
+    constructor: (@x, @y) ->
+    equal: (p) -> p.x == @x and p.y == @y
+    add: (p) -> new Point(@x + p.x, @y + p.y)
+    multiply: (n) -> new Point(@x * n, @y * n)
+class BoardPointLabels
+    constructor: (@boardSize) ->
+        @points = (null for i in [0...size * size])
+    convertPointToIndex = (point) -> point.y * @boardSize + point.x
+    getLabel: (point) -> @points[convertPointToIndex(point)]
+    setLabel: (point, label) -> @points[convertPointToIndex(point)] = label
+setDebugVariables = ->
+    window.wei7debug = {}
+    d = window.wei7debug
+    d.ui = ui
+    d.Point = Point
 document.addEventListener("DOMContentLoaded", ->
     svgPoint = (x, y) ->
         p = ui.root.createSVGPoint()
@@ -63,17 +105,17 @@ document.addEventListener("DOMContentLoaded", ->
     ui.root.appendChild(ui.whiteStoneGradient)
     ui.root.appendChild(ui.blackStone)
     ui.root.appendChild(ui.whiteStone)
-    ui.root.appendChild(ui.homeButton)
     ui.board.marginFactor = 0.728
     ui.board.gridlineWidthFactor = 0.057
     ui.board.borderWidthFactor = 0.133
     ui.board.starRadiusFactor = 0.114
-    ui.board.stoneSizeFactor = 0.96
+    ui.board.stoneSizeFactor = 0.94
     ui.board.axisValue = (index) -> -512 + ui.board.margin + index * ui.board.unitLength
     ui.board.mapPoint = (gamePoint) ->
-        x: ui.board.axisValue(gamePoint.x)
-        y: ui.board.axisValue(gamePoint.y)
+        new Point(ui.board.axisValue(gamePoint.x), ui.board.axisValue(gamePoint.y))
     ui.board.make = (size) ->
+        emptyElement(ui.boardGrid)
+        emptyElement(ui.boardStones)
         ui.board.size = size
         ui.board.unitLength = 1024 / (size - 1 + ui.board.marginFactor * 2)
         ui.board.margin = ui.board.unitLength * ui.board.marginFactor
@@ -106,17 +148,17 @@ document.addEventListener("DOMContentLoaded", ->
                         xmlns="http://www.w3.org/2000/svg" />
             """))
         if size % 2 == 1
-            drawStar({x: (size - 1) / 2, y: (size - 1) / 2})
+            drawStar(new Point((size - 1) / 2, (size - 1) / 2))
             if size > 11
-                drawStar({x: (size - 1) / 2, y: 3})
-                drawStar({x: size - 1 - 3, y: (size - 1) / 2})
-                drawStar({x: (size - 1) / 2, y: size - 1 - 3})
-                drawStar({x: 3, y: (size - 1) / 2})
+                drawStar(new Point((size - 1) / 2, 3))
+                drawStar(new Point(size - 1 - 3, (size - 1) / 2))
+                drawStar(new Point((size - 1) / 2, size - 1 - 3))
+                drawStar(new Point(3, (size - 1) / 2))
         if size > 9
-            drawStar({x: 3, y: 3})
-            drawStar({x: size - 1 - 3, y: 3})
-            drawStar({x: 3, y: size - 1 - 3})
-            drawStar({x: size - 1 - 3, y: size - 1 - 3})
+            drawStar(new Point(3, 3))
+            drawStar(new Point(size - 1 - 3, 3))
+            drawStar(new Point(3, size - 1 - 3))
+            drawStar(new Point(size - 1 - 3, size - 1 - 3))
     ui.board.addStone = (color, gamePoint) ->
         p = ui.board.mapPoint(gamePoint)
         stoneSize = ui.board.unitLength * ui.board.stoneSizeFactor
@@ -126,70 +168,30 @@ document.addEventListener("DOMContentLoaded", ->
             else if color == "white"
                 "whiteStone"
             else fail()
-        ui.boardStones.appendChild(parseElement("""
+        element = parseElement("""
             <use x="#{p.x - stoneSize / 2}" y="#{p.y - stoneSize / 2}"
                     width="#{stoneSize}" height="#{stoneSize}"
                     xlink:href="##{if color == "black" then "blackStone" else "whiteStone"}"
                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        """))
+        """)
+        element.gamePoint = gamePoint
+        element.stoneColor = color
+        ui.boardStones.appendChild(element)
+    ui.board.removeStone = (gamePoint) ->
+        ui.boardStones.removeChild(
+            (m for m in ui.boardStones.childNodes \
+                    when m.nodeType == Node.ELEMENT_NODE and m.gamePoint.equal(gamePoint))[0]
+        )
     ui.board.make(19)
-    ui.board.addStone("black", {x: 0, y: 6})
-    ui.board.addStone("black", {x: 0, y: 7})
-    ui.board.addStone("black", {x: 0, y: 8})
-    ui.board.addStone("black", {x: 0, y: 9})
-    ui.board.addStone("black", {x: 1, y: 9})
-    ui.board.addStone("black", {x: 1, y: 10})
-    ui.board.addStone("black", {x: 2, y: 9})
-    ui.board.addStone("black", {x: 2, y: 8})
-    ui.board.addStone("black", {x: 2, y: 7})
-    ui.board.addStone("black", {x: 2, y: 6})
-    ui.board.addStone("black", {x: 3, y: 9})
-    ui.board.addStone("black", {x: 3, y: 10})
-    ui.board.addStone("black", {x: 4, y: 9})
-    ui.board.addStone("black", {x: 4, y: 8})
-    ui.board.addStone("black", {x: 4, y: 7})
-    ui.board.addStone("black", {x: 4, y: 6})
-    ui.board.addStone("black", {x: 7, y: 8})
-    ui.board.addStone("black", {x: 8, y: 8})
-    ui.board.addStone("black", {x: 9, y: 8})
-    ui.board.addStone("black", {x: 10, y: 8})
-    ui.board.addStone("black", {x: 10, y: 7})
-    ui.board.addStone("black", {x: 9, y: 6})
-    ui.board.addStone("black", {x: 8, y: 6})
-    ui.board.addStone("black", {x: 7, y: 6})
-    ui.board.addStone("black", {x: 6, y: 7})
-    ui.board.addStone("black", {x: 6, y: 8})
-    ui.board.addStone("black", {x: 6, y: 9})
-    ui.board.addStone("black", {x: 7, y: 10})
-    ui.board.addStone("black", {x: 8, y: 10})
-    ui.board.addStone("black", {x: 9, y: 10})
-    ui.board.addStone("black", {x: 10, y: 10})
-    ui.board.addStone("black", {x: 12, y: 6})
-    ui.board.addStone("black", {x: 12, y: 7})
-    ui.board.addStone("black", {x: 12, y: 8})
-    ui.board.addStone("black", {x: 12, y: 9})
-    ui.board.addStone("black", {x: 12, y: 10})
-    ui.board.addStone("black", {x: 12, y: 4})
-    ui.board.addStone("black", {x: 14, y: 4})
-    ui.board.addStone("black", {x: 15, y: 4})
-    ui.board.addStone("black", {x: 16, y: 4})
-    ui.board.addStone("black", {x: 17, y: 4})
-    ui.board.addStone("black", {x: 18, y: 4})
-    ui.board.addStone("black", {x: 17, y: 5})
-    ui.board.addStone("black", {x: 17, y: 6})
-    ui.board.addStone("black", {x: 16, y: 6})
-    ui.board.addStone("black", {x: 16, y: 7})
-    ui.board.addStone("black", {x: 16, y: 8})
-    ui.board.addStone("black", {x: 15, y: 8})
-    ui.board.addStone("black", {x: 15, y: 9})
-    ui.board.addStone("black", {x: 15, y: 10})
-    ui.board.startPosX = ui.root.positionLimit.x + 512 + 256
-    ui.board.transform.baseVal.clear()
-    ui.board.transform.baseVal.appendItem(ui.root.createSVGTransform())
-    ui.board.transform.baseVal.getItem(0).setTranslate(ui.board.startPosX, 0)
+    ui.board.addWelcomeStones()
+    ui.board.startPos = new Point(ui.root.positionLimit.x + 768, 0)
+    setElementTranslate(ui.board, ui.board.startPos)
     ui.root.appendChild(ui.board)
-    valueAnimate(ui.board.startPosX, 0, 750, 400, linearTimingFunction, (value) ->
-        ui.board.transform.baseVal.getItem(0).setTranslate(value, 0)
-    )
-    window.uiBoard = ui.board
+    ui.homeButton.startPos = new Point(0, ui.root.positionLimit.y + 64)
+    setElementTranslate(ui.homeButton, ui.homeButton.startPos)
+    ui.root.appendChild(ui.homeButton)
+    translateAnimate(ui.board, ui.board.startPos, new Point(0, 0), 750, 2000,
+            elasticTimingFunctionGenerator(30, 600, 5))
+    translateAnimate(ui.homeButton, ui.homeButton.startPos, new Point(0, 240), 2400, 600, linearTimingFunction)
 )
+setDebugVariables()
