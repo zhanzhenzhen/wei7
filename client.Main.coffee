@@ -159,6 +159,9 @@ document.addEventListener("DOMContentLoaded", ->
             drawStar(new Point(size - 1 - 3, 3))
             drawStar(new Point(3, size - 1 - 3))
             drawStar(new Point(size - 1 - 3, size - 1 - 3))
+    ui.board.getStone = (gamePoint) ->
+        (m for m in ui.boardStones.childNodes \
+                when m.nodeType == Node.ELEMENT_NODE and m.gamePoint.equal(gamePoint))[0]
     ui.board.addStone = (color, gamePoint) ->
         p = ui.board.mapPoint(gamePoint)
         stoneSize = ui.board.unitLength * ui.board.stoneSizeFactor
@@ -177,11 +180,9 @@ document.addEventListener("DOMContentLoaded", ->
         element.gamePoint = gamePoint
         element.stoneColor = color
         ui.boardStones.appendChild(element)
-    ui.board.removeStone = (gamePoint) ->
-        ui.boardStones.removeChild(
-            (m for m in ui.boardStones.childNodes \
-                    when m.nodeType == Node.ELEMENT_NODE and m.gamePoint.equal(gamePoint))[0]
-        )
+    ui.board.removeStone = (gamePoint) -> ui.boardStones.removeChild(ui.board.getStone(gamePoint))
+    ui.board.setActiveStone = (gamePoint) ->
+        translateToAnimate(ui.board.getStone(gamePoint), new Point(0,4), 0, 500, linearTimingFunction)
     ui.board.make(19)
     ui.board.addWelcomeStones()
     ui.board.startPos = new Point(ui.root.positionLimit.x + 768, 0)
@@ -190,8 +191,7 @@ document.addEventListener("DOMContentLoaded", ->
     ui.homeButton.startPos = new Point(0, ui.root.positionLimit.y + 64)
     setElementTranslate(ui.homeButton, ui.homeButton.startPos)
     ui.root.appendChild(ui.homeButton)
-    translateAnimate(ui.board, ui.board.startPos, new Point(0, 0), 750, 2000,
-            elasticTimingFunctionGenerator(30, 600, 5))
-    translateAnimate(ui.homeButton, ui.homeButton.startPos, new Point(0, 240), 2400, 600, linearTimingFunction)
+    translateToAnimate(ui.board, new Point(0, 0), 750, 2000, elasticTimingFunctionGenerator(30, 600, 5))
+    translateToAnimate(ui.homeButton, new Point(0, 240), 2400, 600, linearTimingFunction)
 )
 setDebugVariables()

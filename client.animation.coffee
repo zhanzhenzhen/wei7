@@ -36,6 +36,8 @@ translateAnimate = (element, startTranslate, endTranslate, startTime, duration, 
     pointAnimate(startTranslate, endTranslate, startTime, duration, timingFunction, (point) ->
         setElementTranslate(element, point)
     )
+translateToAnimate = (element, translate, startTime, duration, timingFunction) ->
+    translateAnimate(element, getElementTranslate(element), translate, startTime, duration, timingFunction)
 linearTimingFunction = (x) -> x
 # 参数a指的是振动的快速程度，b指的是阻尼的大小，c指的是最多允许的振动次数（即周期数。
 # 但因为每个周期我们以cos函数值为0时的点为起始点和终点，所以第一次只有3/4个周期）。
