@@ -20,11 +20,14 @@ valueAnimate = (startValue, endValue, startTime, duration, timingFunction, callb
     timespanAnimate(startTime, duration, (time) ->
         callback(animatedValue(startValue, endValue, duration, time, timingFunction))
     )
-# 基于timespanAnimate。callback具有1个参数point，指的是动画所针对的点，该点的动态变化形成动画。
-pointAnimate = (startPoint, endPoint, startTime, duration, timingFunction, callback) ->
+# 基于timespanAnimate
+translateAnimate = (element, startTranslate, endTranslate, startTime, duration, timingFunction) ->
     timespanAnimate(startTime, duration, (time) ->
-        callback(animatedPoint(startPoint, endPoint, duration, time, timingFunction))
+        setElementTranslate(element,
+                animatedPoint(startTranslate, endTranslate, duration, time, timingFunction))
     )
+translateToAnimate = (element, translate, startTime, duration, timingFunction) ->
+    translateAnimate(element, getElementTranslate(element), translate, startTime, duration, timingFunction)
 animatedValue = (startValue, endValue, duration, currentTime, timingFunction) ->
     startValue + (endValue - startValue) * timingFunction(currentTime / duration)
 animatedPoint = (startPoint, endPoint, duration, currentTime, timingFunction) ->
@@ -32,12 +35,6 @@ animatedPoint = (startPoint, endPoint, duration, currentTime, timingFunction) ->
         animatedValue(startPoint.x, endPoint.x, duration, currentTime, timingFunction),
         animatedValue(startPoint.y, endPoint.y, duration, currentTime, timingFunction)
     )
-translateAnimate = (element, startTranslate, endTranslate, startTime, duration, timingFunction) ->
-    pointAnimate(startTranslate, endTranslate, startTime, duration, timingFunction, (point) ->
-        setElementTranslate(element, point)
-    )
-translateToAnimate = (element, translate, startTime, duration, timingFunction) ->
-    translateAnimate(element, getElementTranslate(element), translate, startTime, duration, timingFunction)
 linearTimingFunction = (x) -> x
 # 参数a指的是振动的快速程度，b指的是阻尼的大小，c指的是最多允许的振动次数（即周期数。
 # 但因为每个周期我们以cos函数值为0时的点为起始点和终点，所以第一次只有3/4个周期）。

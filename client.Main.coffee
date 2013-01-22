@@ -10,15 +10,26 @@ codifyElement = (object, elementString) ->
 ui = {}
 codifyElement(ui, """
     <g id="homeButton" opacity="0.5" xmlns="http://www.w3.org/2000/svg">
-        <rect x="-48" y="-48" width="96" height="96" fill="rgb(255,0,0)" />
+        <rect x="-48" y="-48" width="96" height="96" rx="5" fill="rgb(255,0,0)" />
         <circle r="20" fill="none" stroke="rgb(255,255,255)" stroke-width="8" />
     </g>
 """)
 codifyElement(ui, """
-    <g id="board" xmlns="http://www.w3.org/2000/svg">
+    <g id="home" opacity="0.9" visibility="hidden" xmlns="http://www.w3.org/2000/svg">
+        <rect x="-512" y="-512" width="1024" height="1024" fill="rgb(0,0,0)" />
+    </g>
+""")
+codifyElement(ui, """
+    <g id="board" visibility="hidden" xmlns="http://www.w3.org/2000/svg">
         <rect x="-512" y="-512" width="1024" height="1024" fill="rgb(219,179,119)" />
-        <g id="boardGrid" />
-        <g id="boardStones" />
+        <g id="boardLoads">
+            <g id="boardGrid" />
+            <g id="boardStones" />
+            <g id="boardActiveStoneReminder" opacity="0.5">
+                <rect x="-32" y="-32" width="64" height="64" fill="none" stroke="rgb(255,0,0)"
+                        stroke-width="5" />
+            </g>
+        </g>
     </g>
 """)
 codifyElement(ui, """
@@ -50,6 +61,17 @@ codifyElement(ui, """
     </symbol>
 """)
 emptyElement = (element) -> element.textContent = ""
+showElement = (element) -> element.setAttribute("visibility", "visible")
+hideElement = (element) -> element.setAttribute("visibility", "hidden")
+isElementVisible = (element) ->
+    if window.getComputedStyle(element).visibility == "hidden" then false else true
+slidePageIn = (pageElement) ->
+    translateToAnimate(ui.root.currentPage,
+            new Point(-ui.root.positionLimit.x - 768, 0), 0, 500, easeTimingFunction)
+    setElementTranslate(pageElement, new Point(ui.root.positionLimit.x + 768, 0))
+    showElement(pageElement)
+    translateToAnimate(pageElement, new Point(0, 0), 500, 500, easeTimingFunction)
+    ui.root.currentPage = pageElement
 getElementTranslates = (element) ->
     transform = element.transform.baseVal
     transform.getItem(i) for i in [0...transform.numberOfItems] \
@@ -89,6 +111,17 @@ setDebugVariables = ->
     d = window.wei7debug
     d.ui = ui
     d.Point = Point
+windowWidth = 0
+windowHeight = 0
+refreshForResize = ->
+    w = window.innerWidth
+    h = window.innerHeight
+    if w != windowWidth or h != windowHeight
+        windowWidth = w
+        windowHeight = h
+        ui.root.positionLimit = ui.root.convertPointFromScreen(new Point(w, h))
+        ui.homeButton.relocate() if not isOnWelcome
+isOnWelcome = true
 document.addEventListener("DOMContentLoaded", ->
     svgPoint = (x, y) ->
         p = ui.root.createSVGPoint()
@@ -97,10 +130,15 @@ document.addEventListener("DOMContentLoaded", ->
         p
     ui.root = document.getElementById("root")
     ui.root.convertPointToScreen = (p) ->
-        p.matrixTransform(ui.root.getScreenCTM())
+        p1 = svgPoint(p.x, p.y)
+        p2 = p1.matrixTransform(ui.root.getScreenCTM())
+        new Point(p2.x, p2.y)
     ui.root.convertPointFromScreen = (p) ->
-        p.matrixTransform(ui.root.getScreenCTM().inverse())
-    ui.root.positionLimit = ui.root.convertPointFromScreen(svgPoint(window.innerWidth, window.innerHeight))
+        p1 = svgPoint(p.x, p.y)
+        p2 = p1.matrixTransform(ui.root.getScreenCTM().inverse())
+        new Point(p2.x, p2.y)
+    window.addEventListener("resize", refreshForResize)
+    refreshForResize()
     ui.root.appendChild(ui.blackStoneGradient)
     ui.root.appendChild(ui.whiteStoneGradient)
     ui.root.appendChild(ui.blackStone)
@@ -110,19 +148,25 @@ document.addEventListener("DOMContentLoaded", ->
     ui.board.borderWidthFactor = 0.133
     ui.board.starRadiusFactor = 0.114
     ui.board.stoneSizeFactor = 0.94
-    ui.board.axisValue = (index) -> -512 + ui.board.margin + index * ui.board.unitLength
+    ui.board.axisValue = (index) -> -ui.board.axisValueLimit + ui.board.margin + index * ui.board.unitLength
     ui.board.mapPoint = (gamePoint) ->
         new Point(ui.board.axisValue(gamePoint.x), ui.board.axisValue(gamePoint.y))
     ui.board.make = (size) ->
+        calcUnitLength = (size) -> 1024 / (size - 1 + ui.board.marginFactor * 2)
         emptyElement(ui.boardGrid)
         emptyElement(ui.boardStones)
+        ui.board.setActiveStone(null)
         ui.board.size = size
-        ui.board.unitLength = 1024 / (size - 1 + ui.board.marginFactor * 2)
+        ui.board.unitLength = calcUnitLength(19)
+        ui.board.actualUnitLength = calcUnitLength(size)
+        ui.board.loadsScale = ui.board.actualUnitLength / ui.board.unitLength
+        ui.board.axisValueLimit = 512 / ui.board.loadsScale
+        ui.boardLoads.setAttribute("transform", "scale(#{ui.board.loadsScale})")
         ui.board.margin = ui.board.unitLength * ui.board.marginFactor
         gridlineWidth = ui.board.unitLength * ui.board.gridlineWidthFactor
         borderWidth = ui.board.unitLength * ui.board.borderWidthFactor
         starRadius = ui.board.unitLength * ui.board.starRadiusFactor
-        b = 512 - ui.board.margin
+        b = ui.board.axisValueLimit - ui.board.margin
         for i in [0...size]
             n = ui.board.axisValue(i)
             ui.boardGrid.appendChild(parseElement("""
@@ -182,16 +226,44 @@ document.addEventListener("DOMContentLoaded", ->
         ui.boardStones.appendChild(element)
     ui.board.removeStone = (gamePoint) -> ui.boardStones.removeChild(ui.board.getStone(gamePoint))
     ui.board.setActiveStone = (gamePoint) ->
-        translateToAnimate(ui.board.getStone(gamePoint), new Point(0,4), 0, 500, linearTimingFunction)
+        if gamePoint == null
+            hideElement(ui.boardActiveStoneReminder)
+        else
+            setElementTranslate(ui.boardActiveStoneReminder, ui.board.mapPoint(gamePoint))
+            showElement(ui.boardActiveStoneReminder)
     ui.board.make(19)
     ui.board.addWelcomeStones()
     ui.board.startPos = new Point(ui.root.positionLimit.x + 768, 0)
     setElementTranslate(ui.board, ui.board.startPos)
     ui.root.appendChild(ui.board)
+    ui.root.appendChild(ui.home)
+    ui.homeButton.addEventListener("click", ->
+        if isOnWelcome
+            ui.homeButton.relocate()
+            isOnWelcome = false
+        slidePageIn(ui.home)
+    )
+    ui.homeButton.relocate = ->
+        translateToAnimate(
+            ui.homeButton, (
+                if ui.root.positionLimit.x >= ui.root.positionLimit.y
+                    new Point(
+                        -((ui.root.positionLimit.x + 512) / 2),
+                        -(ui.root.positionLimit.y - ui.homeButton.getBBox().height * 0.38)
+                    )
+                else
+                    new Point(
+                        -(ui.root.positionLimit.x - ui.homeButton.getBBox().width * 0.38),
+                        -((ui.root.positionLimit.y + 512) / 2)
+                    )
+            ), 0, 400, easeTimingFunction
+        )
     ui.homeButton.startPos = new Point(0, ui.root.positionLimit.y + 64)
     setElementTranslate(ui.homeButton, ui.homeButton.startPos)
     ui.root.appendChild(ui.homeButton)
+    showElement(ui.board)
     translateToAnimate(ui.board, new Point(0, 0), 750, 2000, elasticTimingFunctionGenerator(30, 600, 5))
+    ui.root.currentPage = ui.board
     translateToAnimate(ui.homeButton, new Point(0, 240), 2400, 600, linearTimingFunction)
 )
 setDebugVariables()
