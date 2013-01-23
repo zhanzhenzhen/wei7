@@ -9,27 +9,18 @@ codifyElement = (object, elementString) ->
         handle(m)
 ui = {}
 codifyElement(ui, """
-    <g id="homeButton" opacity="0.5" xmlns="http://www.w3.org/2000/svg">
-        <rect x="-48" y="-48" width="96" height="96" rx="5" fill="rgb(255,0,0)" />
-        <circle r="20" fill="none" stroke="rgb(255,255,255)" stroke-width="8" />
-    </g>
-""")
-codifyElement(ui, """
-    <g id="home" opacity="0.9" visibility="hidden" xmlns="http://www.w3.org/2000/svg">
-        <rect x="-512" y="-512" width="1024" height="1024" fill="rgb(0,0,0)" />
-    </g>
-""")
-codifyElement(ui, """
-    <g id="board" visibility="hidden" xmlns="http://www.w3.org/2000/svg">
+    <g id="board" xmlns="http://www.w3.org/2000/svg">
         <rect x="-512" y="-512" width="1024" height="1024" fill="rgb(219,179,119)" />
         <g id="boardLoads">
             <g id="boardGrid" />
             <g id="boardStones" />
+            <g id="boardMarks" />
             <g id="boardActiveStoneReminder" opacity="0.5">
                 <rect x="-32" y="-32" width="64" height="64" fill="none" stroke="rgb(255,0,0)"
                         stroke-width="5" />
             </g>
         </g>
+        <g id="boardDialog" />
     </g>
 """)
 codifyElement(ui, """
@@ -60,18 +51,34 @@ codifyElement(ui, """
         <circle r="64" fill="rgb(238,238,246)" stroke="rgb(128,128,136)" stroke-width="7" />
     </symbol>
 """)
+addSquareButton = (text, position, clickHandler) ->
+    element = parseElement("""
+        <g transform="translate(#{position.x},#{position.y})" cursor="pointer"
+                xmlns="http://www.w3.org/2000/svg">
+            <rect x="-52" y="-52" width="104" height="104" rx="8" opacity="0.8"
+                    fill="rgb(0,128,255)" stroke="rgb(255,255,255)" stroke-width="3" />
+            <text x="0" y="20" fill="rgb(255,255,255)" font-size="56" text-anchor="middle" />
+        </g>
+    """)
+    element.getElementsByTagName("text")[0].textContent = text
+    element.addEventListener("click", clickHandler) if clickHandler != null and clickHandler != undefined
+    ui.boardDialog.appendChild(element)
+    element
 emptyElement = (element) -> element.textContent = ""
 showElement = (element) -> element.setAttribute("visibility", "visible")
 hideElement = (element) -> element.setAttribute("visibility", "hidden")
 isElementVisible = (element) ->
     if window.getComputedStyle(element).visibility == "hidden" then false else true
-slidePageIn = (pageElement) ->
-    translateToAnimate(ui.root.currentPage,
-            new Point(-ui.root.positionLimit.x - 768, 0), 0, 500, easeTimingFunction)
-    setElementTranslate(pageElement, new Point(ui.root.positionLimit.x + 768, 0))
-    showElement(pageElement)
-    translateToAnimate(pageElement, new Point(0, 0), 500, 500, easeTimingFunction)
-    ui.root.currentPage = pageElement
+# callback在棋盘“消失”动画后“出现”动画前被调用，它可以包含对新棋盘将要显示的按钮、棋子等的绘画语句
+initBoard = (size, callback) ->
+    translateToAnimate(
+        ui.board, new Point(-ui.root.positionLimit.x - 768, 0),
+        null, 0, 500, easeTimingFunction, ->
+            ui.board.make(size)
+            callback?()
+            translateAnimate(ui.board, new Point(ui.root.positionLimit.x + 768, 0), new Point(0, 0),
+                    null, 0, 500, easeTimingFunction)
+    )
 getElementTranslates = (element) ->
     transform = element.transform.baseVal
     transform.getItem(i) for i in [0...transform.numberOfItems] \
@@ -120,8 +127,15 @@ refreshForResize = ->
         windowWidth = w
         windowHeight = h
         ui.root.positionLimit = ui.root.convertPointFromScreen(new Point(w, h))
-        ui.homeButton.relocate() if not isOnWelcome
-isOnWelcome = true
+applyHomePage = ->
+    ui.board.addWelcomeStones()
+    addSquareButton("人", new Point(-320, 224), -> initBoard(19, ->
+        addSquareButton("回", new Point(0, 0), -> initBoard(19, applyHomePage))
+    ))
+    addSquareButton("机", new Point(-160, 224), -> initBoard(19))
+    addSquareButton("学", new Point(0, 224), -> initBoard(19))
+    addSquareButton("谱", new Point(160, 224), -> initBoard(19))
+    addSquareButton("?", new Point(320, 224), undefined)
 document.addEventListener("DOMContentLoaded", ->
     svgPoint = (x, y) ->
         p = ui.root.createSVGPoint()
@@ -155,6 +169,8 @@ document.addEventListener("DOMContentLoaded", ->
         calcUnitLength = (size) -> 1024 / (size - 1 + ui.board.marginFactor * 2)
         emptyElement(ui.boardGrid)
         emptyElement(ui.boardStones)
+        emptyElement(ui.boardMarks)
+        emptyElement(ui.boardDialog)
         ui.board.setActiveStone(null)
         ui.board.size = size
         ui.board.unitLength = calcUnitLength(19)
@@ -232,38 +248,9 @@ document.addEventListener("DOMContentLoaded", ->
             setElementTranslate(ui.boardActiveStoneReminder, ui.board.mapPoint(gamePoint))
             showElement(ui.boardActiveStoneReminder)
     ui.board.make(19)
-    ui.board.addWelcomeStones()
-    ui.board.startPos = new Point(ui.root.positionLimit.x + 768, 0)
-    setElementTranslate(ui.board, ui.board.startPos)
+    applyHomePage()
+    setElementTranslate(ui.board, new Point(ui.root.positionLimit.x + 768, 0))
     ui.root.appendChild(ui.board)
-    ui.root.appendChild(ui.home)
-    ui.homeButton.addEventListener("click", ->
-        if isOnWelcome
-            ui.homeButton.relocate()
-            isOnWelcome = false
-        slidePageIn(ui.home)
-    )
-    ui.homeButton.relocate = ->
-        translateToAnimate(
-            ui.homeButton, (
-                if ui.root.positionLimit.x >= ui.root.positionLimit.y
-                    new Point(
-                        -((ui.root.positionLimit.x + 512) / 2),
-                        -(ui.root.positionLimit.y - ui.homeButton.getBBox().height * 0.38)
-                    )
-                else
-                    new Point(
-                        -(ui.root.positionLimit.x - ui.homeButton.getBBox().width * 0.38),
-                        -((ui.root.positionLimit.y + 512) / 2)
-                    )
-            ), 0, 400, easeTimingFunction
-        )
-    ui.homeButton.startPos = new Point(0, ui.root.positionLimit.y + 64)
-    setElementTranslate(ui.homeButton, ui.homeButton.startPos)
-    ui.root.appendChild(ui.homeButton)
-    showElement(ui.board)
-    translateToAnimate(ui.board, new Point(0, 0), 750, 2000, elasticTimingFunctionGenerator(30, 600, 5))
-    ui.root.currentPage = ui.board
-    translateToAnimate(ui.homeButton, new Point(0, 240), 2400, 600, linearTimingFunction)
+    translateToAnimate(ui.board, new Point(0, 0), null, 750, 2000, elasticTimingFunctionGenerator(30, 600, 5))
 )
 setDebugVariables()

@@ -1,33 +1,46 @@
 # 基于并改进了window.requestAnimationFrame，使之不用在回调函数中再写一次window.requestAnimationFrame。
-# callback的参数time变为更直观的意思：调用animate之后经过的时间。当callback返回false时，停止动画。
-# callback具有1个参数。
-animate = (callback) ->
-    f = (time) -> if callback(time - startTime) != false then window.requestAnimationFrame(f)
-    startTime = window.performance.now()
+# syncTime使多个该函数同时使用时可以避免各自的时间系统可能存在微量偏移的问题，其含义源自window.performance.now()。
+# callback的参数time变为更直观的意思：syncTime之后，或调用animate之后（当syncTime为null），经过的时间。
+# 当callback返回false时，停止动画。callback具有1个参数。
+animate = (syncTime, callback) ->
+    f = (time) -> if callback(time - syncTime) != false then window.requestAnimationFrame(f)
+    syncTime ?= window.performance.now()
     window.requestAnimationFrame(f)
-# 基于animate。callback具有1个参数time，指的是startTime之后经过的时间。
-timespanAnimate = (startTime, duration, callback) ->
+# 基于animate
+delay = (syncTime, duration, callback) ->
+    animate(syncTime, (time) ->
+        if time >= duration
+            callback()
+            false
+    )
+# 基于animate。frameCallback具有1个参数time，指的是startTime之后经过的时间。
+# endCallback会在最后一次frameCallback被调用后立即被调用。如它为undefined（或null），则该功能不启用。
+timespanAnimate = (syncTime, startTime, duration, frameCallback, endCallback) ->
     endTime = startTime + duration
-    animate((time) ->
+    animate(syncTime, (time) ->
         if time >= endTime
-            callback(duration)
+            frameCallback(duration)
+            endCallback?()
             false
         else if time >= startTime
-            callback(time - startTime)
+            frameCallback(time - startTime)
     )
-# 基于timespanAnimate。callback具有1个参数value，指的是动画所针对的值，该值的动态变化形成动画。
-valueAnimate = (startValue, endValue, startTime, duration, timingFunction, callback) ->
-    timespanAnimate(startTime, duration, (time) ->
-        callback(animatedValue(startValue, endValue, duration, time, timingFunction))
-    )
+# 基于timespanAnimate。frameCallback具有1个参数value，指的是动画所针对的值，该值的动态变化形成动画。
+valueAnimate = (startValue, endValue, syncTime, startTime, duration,
+        timingFunction, frameCallback, endCallback) ->
+    timespanAnimate(syncTime, startTime, duration, (time) ->
+        frameCallback(animatedValue(startValue, endValue, duration, time, timingFunction))
+    , endCallback)
 # 基于timespanAnimate
-translateAnimate = (element, startTranslate, endTranslate, startTime, duration, timingFunction) ->
-    timespanAnimate(startTime, duration, (time) ->
+translateAnimate = (element, startTranslate, endTranslate, syncTime, startTime, duration,
+        timingFunction, endCallback) ->
+    timespanAnimate(syncTime, startTime, duration, (time) ->
         setElementTranslate(element,
                 animatedPoint(startTranslate, endTranslate, duration, time, timingFunction))
-    )
-translateToAnimate = (element, translate, startTime, duration, timingFunction) ->
-    translateAnimate(element, getElementTranslate(element), translate, startTime, duration, timingFunction)
+    , endCallback)
+translateToAnimate = (element, translate, syncTime, startTime, duration, timingFunction, endCallback) ->
+    translateAnimate(element, getElementTranslate(element), translate,
+            syncTime, startTime, duration, timingFunction, endCallback)
 animatedValue = (startValue, endValue, duration, currentTime, timingFunction) ->
     startValue + (endValue - startValue) * timingFunction(currentTime / duration)
 animatedPoint = (startPoint, endPoint, duration, currentTime, timingFunction) ->
