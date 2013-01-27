@@ -61,7 +61,7 @@ addSquareButton = (text, position, clickHandler) ->
         </g>
     """)
     element.getElementsByTagName("text")[0].textContent = text
-    element.addEventListener("click", clickHandler) if clickHandler != null and clickHandler != undefined
+    element.addEventListener("click", clickHandler) if clickHandler?
     ui.boardDialog.appendChild(element)
     element
 emptyElement = (element) -> element.textContent = ""
@@ -102,11 +102,6 @@ setElementTranslate = (element, value) ->
         else
             currentTranslates[currentTranslates.length - 1]
     translate.setTranslate(value.x, value.y)
-class Point
-    constructor: (@x, @y) ->
-    equal: (p) -> p.x == @x and p.y == @y
-    add: (p) -> new Point(@x + p.x, @y + p.y)
-    multiply: (n) -> new Point(@x * n, @y * n)
 class BoardPointLabels
     constructor: (@boardSize) ->
         @points = (null for i in [0...size * size])
@@ -118,6 +113,7 @@ setDebugVariables = ->
     d = window.wei7debug
     d.ui = ui
     d.Point = Point
+    d.Game = Game
 windowWidth = 0
 windowHeight = 0
 refreshForResize = ->
