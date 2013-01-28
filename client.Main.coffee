@@ -1,3 +1,13 @@
+game = null
+ui = {}
+windowWidth = 0
+windowHeight = 0
+class BoardPointLabels
+    constructor: (@boardSize) ->
+        @points = (null for i in [0...size * size])
+    convertPointToIndex = (point) -> point.y * @boardSize + point.x
+    getLabel: (point) -> @points[convertPointToIndex(point)]
+    setLabel: (point, label) -> @points[convertPointToIndex(point)] = label
 parseElement = (s) -> (new DOMParser()).parseFromString(s, "application/xml").documentElement
 codifyElement = (object, elementString) ->
     handle = (element) ->
@@ -7,7 +17,6 @@ codifyElement = (object, elementString) ->
     handle(rootElement)
     for m in rootElement.getElementsByTagName("*")
         handle(m)
-ui = {}
 codifyElement(ui, """
     <g id="board" xmlns="http://www.w3.org/2000/svg">
         <rect x="-512" y="-512" width="1024" height="1024" fill="rgb(219,179,119)" />
@@ -15,11 +24,12 @@ codifyElement(ui, """
             <g id="boardGrid" />
             <g id="boardStones" />
             <g id="boardMarks" />
-            <g id="boardActiveStoneReminder" opacity="0.5">
+            <g id="boardActiveStoneReminder" opacity="0.25">
                 <rect x="-32" y="-32" width="64" height="64" fill="none" stroke="rgb(255,0,0)"
                         stroke-width="5" />
             </g>
         </g>
+        <rect id="boardInput" x="-512" y="-512" width="1024" height="1024" opacity="0" cursor="crosshair" />
         <g id="boardDialog" />
     </g>
 """)
@@ -69,98 +79,18 @@ showElement = (element) -> element.setAttribute("visibility", "visible")
 hideElement = (element) -> element.setAttribute("visibility", "hidden")
 isElementVisible = (element) ->
     if window.getComputedStyle(element).visibility == "hidden" then false else true
-# callback在棋盘“消失”动画后“出现”动画前被调用，它可以包含对新棋盘将要显示的按钮、棋子等的绘画语句
-initBoard = (size, callback) ->
-    translateToAnimate(
-        ui.board, new Point(-ui.root.positionLimit.x - 768, 0),
-        null, 0, 500, easeTimingFunction, ->
-            ui.board.make(size)
-            callback?()
-            translateAnimate(ui.board, new Point(ui.root.positionLimit.x + 768, 0), new Point(0, 0),
-                    null, 0, 500, easeTimingFunction)
-    )
-getElementTranslates = (element) ->
-    transform = element.transform.baseVal
-    transform.getItem(i) for i in [0...transform.numberOfItems] \
-            when transform.getItem(i).type == SVGTransform.SVG_TRANSFORM_TRANSLATE
-# 返回元素的最后一个translate的值，如没有则返回(0,0)
-getElementTranslate = (element) ->
-    currentTranslates = getElementTranslates(element)
-    if currentTranslates.length == 0
-        new Point(0, 0)
-    else
-        matrix = currentTranslates[currentTranslates.length - 1].matrix
-        new Point(matrix.e, matrix.f)
-# 修改元素的最后一个translate的值，如没有则创建
-setElementTranslate = (element, value) ->
-    transform = element.transform.baseVal
-    currentTranslates = getElementTranslates(element)
-    translate =
-        if currentTranslates.length == 0
-            transform.appendItem(ui.root.createSVGTransform())
-            transform.getItem(transform.numberOfItems - 1)
-        else
-            currentTranslates[currentTranslates.length - 1]
-    translate.setTranslate(value.x, value.y)
-class BoardPointLabels
-    constructor: (@boardSize) ->
-        @points = (null for i in [0...size * size])
-    convertPointToIndex = (point) -> point.y * @boardSize + point.x
-    getLabel: (point) -> @points[convertPointToIndex(point)]
-    setLabel: (point, label) -> @points[convertPointToIndex(point)] = label
-setDebugVariables = ->
-    window.wei7debug = {}
-    d = window.wei7debug
-    d.ui = ui
-    d.Point = Point
-    d.Game = Game
-windowWidth = 0
-windowHeight = 0
-refreshForResize = ->
-    w = window.innerWidth
-    h = window.innerHeight
-    if w != windowWidth or h != windowHeight
-        windowWidth = w
-        windowHeight = h
-        ui.root.positionLimit = ui.root.convertPointFromScreen(new Point(w, h))
-applyHomePage = ->
-    ui.board.addWelcomeStones()
-    addSquareButton("人", new Point(-320, 224), -> initBoard(19, ->
-        addSquareButton("回", new Point(0, 0), -> initBoard(19, applyHomePage))
-    ))
-    addSquareButton("机", new Point(-160, 224), -> initBoard(19))
-    addSquareButton("学", new Point(0, 224), -> initBoard(19))
-    addSquareButton("谱", new Point(160, 224), -> initBoard(19))
-    addSquareButton("?", new Point(320, 224), undefined)
-document.addEventListener("DOMContentLoaded", ->
-    svgPoint = (x, y) ->
-        p = ui.root.createSVGPoint()
-        p.x = x
-        p.y = y
-        p
-    ui.root = document.getElementById("root")
-    ui.root.convertPointToScreen = (p) ->
-        p1 = svgPoint(p.x, p.y)
-        p2 = p1.matrixTransform(ui.root.getScreenCTM())
-        new Point(p2.x, p2.y)
-    ui.root.convertPointFromScreen = (p) ->
-        p1 = svgPoint(p.x, p.y)
-        p2 = p1.matrixTransform(ui.root.getScreenCTM().inverse())
-        new Point(p2.x, p2.y)
-    window.addEventListener("resize", refreshForResize)
-    refreshForResize()
-    ui.root.appendChild(ui.blackStoneGradient)
-    ui.root.appendChild(ui.whiteStoneGradient)
-    ui.root.appendChild(ui.blackStone)
-    ui.root.appendChild(ui.whiteStone)
+buildBoard = ->
     ui.board.marginFactor = 0.728
     ui.board.gridlineWidthFactor = 0.057
     ui.board.borderWidthFactor = 0.133
     ui.board.starRadiusFactor = 0.114
     ui.board.stoneSizeFactor = 0.94
     ui.board.axisValue = (index) -> -ui.board.axisValueLimit + ui.board.margin + index * ui.board.unitLength
-    ui.board.mapPoint = (gamePoint) ->
+    ui.board.mapPointToUI = (gamePoint) ->
         new Point(ui.board.axisValue(gamePoint.x), ui.board.axisValue(gamePoint.y))
+    ui.board.mapPointFromUI = (uiPoint) ->
+        f = (x) -> Math.round((x + ui.board.axisValueLimit - ui.board.margin) / ui.board.unitLength)
+        new Point(f(uiPoint.x), f(uiPoint.y))
     ui.board.make = (size) ->
         calcUnitLength = (size) -> 1024 / (size - 1 + ui.board.marginFactor * 2)
         emptyElement(ui.boardGrid)
@@ -197,7 +127,7 @@ document.addEventListener("DOMContentLoaded", ->
                     xmlns="http://www.w3.org/2000/svg" />
         """))
         drawStar = (point) ->
-            p = ui.board.mapPoint(point)
+            p = ui.board.mapPointToUI(point)
             ui.boardGrid.appendChild(parseElement("""
                 <circle r="#{starRadius}" cx="#{p.x}" cy="#{p.y}"
                         fill="rgb(146,119,101)"
@@ -217,32 +147,180 @@ document.addEventListener("DOMContentLoaded", ->
             drawStar(new Point(size - 1 - 3, size - 1 - 3))
     ui.board.getStone = (gamePoint) ->
         (m for m in ui.boardStones.childNodes \
-                when m.nodeType == Node.ELEMENT_NODE and m.gamePoint.equal(gamePoint))[0]
-    ui.board.addStone = (color, gamePoint) ->
-        p = ui.board.mapPoint(gamePoint)
+                when m.nodeType == Node.ELEMENT_NODE and \
+                m.gamePoint.equal(gamePoint) and \
+                not m.isObsolete)[0]
+    ui.board.addStone = (color, gamePoint, useAnimation) ->
+        p = ui.board.mapPointToUI(gamePoint)
         stoneSize = ui.board.unitLength * ui.board.stoneSizeFactor
         symbolID =
-            if color == "black"
+            if color == Game.COLOR_BLACK
                 "blackStone"
-            else if color == "white"
+            else if color == Game.COLOR_WHITE
                 "whiteStone"
             else fail()
         element = parseElement("""
-            <use x="#{p.x - stoneSize / 2}" y="#{p.y - stoneSize / 2}"
+            <use x="#{-(stoneSize / 2)}" y="#{-(stoneSize / 2)}"
                     width="#{stoneSize}" height="#{stoneSize}"
-                    xlink:href="##{if color == "black" then "blackStone" else "whiteStone"}"
+                    transform="translate(#{p.x},#{p.y})"
+                    xlink:href="##{symbolID}"
                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" />
         """)
         element.gamePoint = gamePoint
         element.stoneColor = color
-        ui.boardStones.appendChild(element)
-    ui.board.removeStone = (gamePoint) -> ui.boardStones.removeChild(ui.board.getStone(gamePoint))
-    ui.board.setActiveStone = (gamePoint) ->
-        if gamePoint == null
-            hideElement(ui.boardActiveStoneReminder)
+        element.isObsolete = false # 吃子动画时将被吃的子的该属性设为true可防止该子被误认为仍在棋盘上
+        if useAnimation
+            setElementScale(element, 0.000001) # IE似乎有bug，如设为0则有时会不显示
+            ui.boardStones.appendChild(element)
+            scaleToAnimate(element, 1, null, 0, 400, popTimingFunction)
         else
-            setElementTranslate(ui.boardActiveStoneReminder, ui.board.mapPoint(gamePoint))
-            showElement(ui.boardActiveStoneReminder)
+            ui.boardStones.appendChild(element)
+    ui.board.removeStone = (gamePoint, useAnimation) ->
+        element = ui.board.getStone(gamePoint)
+        element.isObsolete = true
+        if useAnimation
+            scaleToAnimate(
+                element, 0.000001, null, 200, 400, easeTimingFunction, ->
+                    ui.boardStones.removeChild(element)
+            )
+        else
+            ui.boardStones.removeChild(element)
+    ui.board.setActiveStone = (gamePoint) ->
+        reminder = ui.boardActiveStoneReminder
+        if gamePoint == null
+            hideElement(reminder)
+        else
+            p = ui.board.mapPointToUI(gamePoint)
+            if isElementVisible(reminder)
+                translateToAnimate(reminder, p, null, 200, 600, linearTimingFunction)
+            else
+                setElementTranslate(reminder, p)
+                setElementScale(reminder, 0.000001)
+                showElement(reminder)
+                scaleToAnimate(reminder, 1, null, 200, 600, popTimingFunction)
+    ui.board.updateStones = (diff, useAnimation) ->
+        for i in [0...diff.length]
+            item = diff[i]
+            if item.color == Game.COLOR_EMPTY
+                ui.board.removeStone(item.position, useAnimation)
+            else
+                ui.board.addStone(item.color, item.position, useAnimation)
+    ui.boardInput.addEventListener("click", (event) ->
+        if game != null
+            point = ui.board.mapPointFromUI(
+                ui.root.convertPointFromClient(new Point(event.clientX, event.clientY))
+            )
+            if 0 <= point.x < ui.board.size and 0 <= point.y < ui.board.size
+                color = game.getNextColor()
+                oldSnapshot = game.getBoardSnapshot()
+                game.playMove({color: color, position: point})
+                newSnapshot = game.getBoardSnapshot()
+                diff = Game.compareSnapshots(oldSnapshot, newSnapshot)
+                ui.board.updateStones(diff, true)
+                ui.board.setActiveStone(point)
+    )
+# callback在棋盘“消失”动画后“出现”动画前被调用，它可以包含对新棋盘将要显示的按钮、棋子等的绘画语句
+initBoard = (size, callback) ->
+    translateToAnimate(
+        ui.board, new Point(-ui.root.positionLimit.x - 768, 0),
+        null, 0, 500, easeTimingFunction, ->
+            ui.board.make(size)
+            callback?()
+            translateAnimate(ui.board, new Point(ui.root.positionLimit.x + 768, 0), new Point(0, 0),
+                    null, 0, 500, easeTimingFunction)
+    )
+getElementTranslates = (element) ->
+    transform = element.transform.baseVal
+    transform.getItem(i) for i in [0...transform.numberOfItems] \
+            when transform.getItem(i).type == SVGTransform.SVG_TRANSFORM_TRANSLATE
+# 返回元素的最后一个translate的值，如没有则返回(0,0)
+getElementTranslate = (element) ->
+    currentTranslates = getElementTranslates(element)
+    if currentTranslates.length == 0
+        new Point(0, 0)
+    else
+        matrix = currentTranslates[currentTranslates.length - 1].matrix
+        new Point(matrix.e, matrix.f)
+# 修改元素的最后一个translate的值，如没有则创建
+setElementTranslate = (element, value) ->
+    transform = element.transform.baseVal
+    currentTranslates = getElementTranslates(element)
+    translate =
+        if currentTranslates.length == 0
+            transform.appendItem(ui.root.createSVGTransform())
+            transform.getItem(transform.numberOfItems - 1)
+        else
+            currentTranslates[currentTranslates.length - 1]
+    translate.setTranslate(value.x, value.y)
+getElementScales = (element) ->
+    transform = element.transform.baseVal
+    transform.getItem(i) for i in [0...transform.numberOfItems] \
+            when transform.getItem(i).type == SVGTransform.SVG_TRANSFORM_SCALE
+# 返回元素的最后一个scale的值，如没有则返回1
+getElementScale = (element) ->
+    currentScales = getElementScales(element)
+    if currentScales.length == 0
+        1
+    else
+        matrix = currentScales[currentScales.length - 1].matrix
+        (matrix.a + matrix.d) / 2 # 取平均值纯粹是为了好看
+# 修改元素的最后一个scale的值，如没有则创建
+setElementScale = (element, value) ->
+    transform = element.transform.baseVal
+    currentScales = getElementScales(element)
+    scale =
+        if currentScales.length == 0
+            transform.appendItem(ui.root.createSVGTransform())
+            transform.getItem(transform.numberOfItems - 1)
+        else
+            currentScales[currentScales.length - 1]
+    scale.setScale(value, value)
+setDebugVariables = ->
+    window.wei7debug = {}
+    d = window.wei7debug
+    d.ui = ui
+    d.Point = Point
+    d.Game = Game
+refreshForResize = ->
+    w = window.innerWidth
+    h = window.innerHeight
+    if w != windowWidth or h != windowHeight
+        windowWidth = w
+        windowHeight = h
+        ui.root.positionLimit = ui.root.convertPointFromClient(new Point(w, h))
+applyHomePage = ->
+    ui.board.addWelcomeStones()
+    addSquareButton("人", new Point(-320, 224), -> initBoard(19, ->
+        addSquareButton("回", new Point(0, 0), -> initBoard(19, applyHomePage))
+    ))
+    addSquareButton("机", new Point(-160, 224), -> initBoard(19, ->
+        game = new Game(19, Game.COLOR_BLACK)
+    ))
+    addSquareButton("学", new Point(0, 224), -> initBoard(19))
+    addSquareButton("谱", new Point(160, 224), -> initBoard(19))
+    addSquareButton("?", new Point(320, 224), undefined)
+document.addEventListener("DOMContentLoaded", ->
+    svgPoint = (x, y) ->
+        p = ui.root.createSVGPoint()
+        p.x = x
+        p.y = y
+        p
+    ui.root = document.getElementById("root")
+    ui.root.convertPointToClient = (p) ->
+        p1 = svgPoint(p.x, p.y)
+        p2 = p1.matrixTransform(ui.root.getScreenCTM())
+        new Point(p2.x, p2.y)
+    ui.root.convertPointFromClient = (p) ->
+        p1 = svgPoint(p.x, p.y)
+        p2 = p1.matrixTransform(ui.root.getScreenCTM().inverse())
+        new Point(p2.x, p2.y)
+    window.addEventListener("resize", refreshForResize)
+    refreshForResize()
+    ui.root.appendChild(ui.blackStoneGradient)
+    ui.root.appendChild(ui.whiteStoneGradient)
+    ui.root.appendChild(ui.blackStone)
+    ui.root.appendChild(ui.whiteStone)
+    buildBoard()
     ui.board.make(19)
     applyHomePage()
     setElementTranslate(ui.board, new Point(ui.root.positionLimit.x + 768, 0))

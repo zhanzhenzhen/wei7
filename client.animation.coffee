@@ -14,6 +14,7 @@ delay = (syncTime, duration, callback) ->
             false
     )
 # 基于animate。frameCallback具有1个参数time，指的是startTime之后经过的时间。
+# 当timespan规定的时间段结束后或frameCallback返回false后，停止动画。
 # endCallback会在最后一次frameCallback被调用后立即被调用。如它为undefined（或null），则该功能不启用。
 timespanAnimate = (syncTime, startTime, duration, frameCallback, endCallback) ->
     endTime = startTime + duration
@@ -31,15 +32,34 @@ valueAnimate = (startValue, endValue, syncTime, startTime, duration,
     timespanAnimate(syncTime, startTime, duration, (time) ->
         frameCallback(animatedValue(startValue, endValue, duration, time, timingFunction))
     , endCallback)
-# 基于timespanAnimate
+# 基于timespanAnimate。用令牌机制防止一个element同时运行多个translate动画。
 translateAnimate = (element, startTranslate, endTranslate, syncTime, startTime, duration,
         timingFunction, endCallback) ->
+    token = {}
+    element.currentTranslateAnimation = token
     timespanAnimate(syncTime, startTime, duration, (time) ->
-        setElementTranslate(element,
-                animatedPoint(startTranslate, endTranslate, duration, time, timingFunction))
+        if element.currentTranslateAnimation == token
+            setElementTranslate(element,
+                    animatedPoint(startTranslate, endTranslate, duration, time, timingFunction))
+        else
+            false
     , endCallback)
 translateToAnimate = (element, translate, syncTime, startTime, duration, timingFunction, endCallback) ->
     translateAnimate(element, getElementTranslate(element), translate,
+            syncTime, startTime, duration, timingFunction, endCallback)
+# 基于timespanAnimate。用令牌机制防止一个element同时运行多个scale动画。
+scaleAnimate = (element, startScale, endScale, syncTime, startTime, duration,
+        timingFunction, endCallback) ->
+    token = {}
+    element.currentScaleAnimation = token
+    timespanAnimate(syncTime, startTime, duration, (time) ->
+        if element.currentScaleAnimation == token
+            setElementScale(element, animatedValue(startScale, endScale, duration, time, timingFunction))
+        else
+            false
+    , endCallback)
+scaleToAnimate = (element, scale, syncTime, startTime, duration, timingFunction, endCallback) ->
+    scaleAnimate(element, getElementScale(element), scale,
             syncTime, startTime, duration, timingFunction, endCallback)
 animatedValue = (startValue, endValue, duration, currentTime, timingFunction) ->
     startValue + (endValue - startValue) * timingFunction(currentTime / duration)
@@ -80,3 +100,4 @@ cubicBezierTimingFunctionGenerator = (p1, p2) ->
                 i++
             fy(t)
 easeTimingFunction = cubicBezierTimingFunctionGenerator(new Point(0.25, 0.1), new Point(0.25, 1.0))
+popTimingFunction = cubicBezierTimingFunctionGenerator(new Point(0.25, 0.1), new Point(0.25, 2.0))

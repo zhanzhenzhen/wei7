@@ -1,9 +1,11 @@
 ###
 Game类实现了最底层的棋局。它既可以表示正在播放的棋谱中的棋，也可以表示正在对局中的棋。
 它的主要作用是使棋盘的状态符合围棋的基本规则。
-    注意：Game不能储存变化（分支），也不控制UI的呈现，也没有打劫禁手，也无法判断胜负。
+    注意：Game不能储存变化（分支），也不控制UI的呈现，也没有打劫禁手，也无法判断胜负，
+    甚至不强制黑白双方交替下子（即一方可以连下两手或以上）。
     这些功能由更加高阶的模块来提供。不过Game可以回退（即俗称的“悔棋”）。
     为啥没有打劫禁手，因为当作为教程需要说明规则时，就需要一些违反规则的例子。
+    不强制交替下子的原因也一样。而且有些搞笑的“勺子”棋谱恰恰就有这些情况出现。
 首先是一些要素：
 Color指“颜色”，即黑、白、空三者之一。
 Position指棋盘上一个点的坐标，含x,y属性。
@@ -23,8 +25,9 @@ class Game
     @COLOR_EMPTY: 0
     @COLOR_BLACK: 1
     @COLOR_WHITE: 2
-    that = @
+    that = undefined
     constructor: (@size, @firstColor) ->
+        that = @
         @secondColor = Game.getOpposite(firstColor)
         @moves = []
         @_board = @_createBoard()
@@ -57,7 +60,7 @@ class Game
                     pos = chain.positions[j]
                     that._getBoardItem(pos).chain = @
                     @positions.push(pos)
-                that._chains.splice($.inArray(chain, that._chains), 1)
+                that._chains.splice(that._chains.indexOf(chain), 1)
         clone: ->
             newChain = new Chain(@color)
             newPositions = newChain.positions
@@ -80,12 +83,7 @@ class Game
                 itemNew = newSnapshot[x][y]
                 itemOld = oldSnapshot[x][y]
                 if itemNew != itemOld
-                    diff.push(
-                        color: itemNew
-                        position:
-                            x: x
-                            y: y
-                    )
+                    diff.push({color: itemNew, position: new Point(x, y)})
         diff
     getBoardSnapshot: ->
         snapshot = []
@@ -137,7 +135,7 @@ class Game
                             boardItem = @_getBoardItem(item)
                             boardItem.color = Game.COLOR_EMPTY
                             boardItem.chain = null
-                        @_chains.splice($.inArray(chain, @_chains), 1)
+                        @_chains.splice(@_chains.indexOf(chain), 1)
                         hasCaptures = true
             # )*****
             @moves.push(move)
@@ -162,7 +160,7 @@ class Game
         board
     # 属于color一方的与pos相邻的所有的chain（显然最多可以有4个）
     _getAdjacentChains: (pos, color) ->
-        tryPush = (chain) => if $.inArray(chain, result) == -1 then result.push(chain)
+        tryPush = (chain) => if result.indexOf(chain) == -1 then result.push(chain)
         x = pos.x
         y = pos.y
         result = []
