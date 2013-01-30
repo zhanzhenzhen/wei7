@@ -172,15 +172,15 @@ buildBoard = ->
         if useAnimation
             setElementScale(element, 0.000001) # IE似乎有bug，如设为0则有时会不显示
             ui.boardStones.appendChild(element)
-            scaleToAnimate(element, 1, null, 0, 400, popTimingFunction)
+            scaleAnimate(element, undefined, 1, undefined, 0, 400, popTimingFunction)
         else
             ui.boardStones.appendChild(element)
     ui.board.removeStone = (gamePoint, useAnimation) ->
         element = ui.board.getStone(gamePoint)
         element.isObsolete = true
         if useAnimation
-            scaleToAnimate(
-                element, 0.000001, null, 200, 400, easeTimingFunction, ->
+            scaleAnimate(
+                element, undefined, 0.000001, undefined, 200, 400, easeTimingFunction, ->
                     ui.boardStones.removeChild(element)
             )
         else
@@ -192,12 +192,12 @@ buildBoard = ->
         else
             p = ui.board.mapPointToUI(gamePoint)
             if isElementVisible(reminder)
-                translateToAnimate(reminder, p, null, 200, 600, linearTimingFunction)
+                translateAnimate(reminder, undefined, p, undefined, 200, 600, linearTimingFunction)
             else
                 setElementTranslate(reminder, p)
                 setElementScale(reminder, 0.000001)
                 showElement(reminder)
-                scaleToAnimate(reminder, 1, null, 200, 600, popTimingFunction)
+                scaleAnimate(reminder, undefined, 1, undefined, 200, 600, popTimingFunction)
     ui.board.updateStones = (diff, useAnimation) ->
         for i in [0...diff.length]
             item = diff[i]
@@ -221,13 +221,13 @@ buildBoard = ->
     )
 # callback在棋盘“消失”动画后“出现”动画前被调用，它可以包含对新棋盘将要显示的按钮、棋子等的绘画语句
 initBoard = (size, callback) ->
-    translateToAnimate(
-        ui.board, new Point(-ui.root.positionLimit.x - 768, 0),
-        null, 0, 500, easeTimingFunction, ->
+    translateAnimate(
+        ui.board, undefined, new Point(-ui.root.positionLimit.x - 768, 0),
+        undefined, 0, 500, easeTimingFunction, ->
             ui.board.make(size)
             callback?()
             translateAnimate(ui.board, new Point(ui.root.positionLimit.x + 768, 0), new Point(0, 0),
-                    null, 0, 500, easeTimingFunction)
+                    undefined, 0, 500, easeTimingFunction)
     )
 getElementTranslates = (element) ->
     transform = element.transform.baseVal
@@ -281,6 +281,7 @@ setDebugVariables = ->
     d.ui = ui
     d.Point = Point
     d.Game = Game
+    d.LegalGame = LegalGame
 refreshForResize = ->
     w = window.innerWidth
     h = window.innerHeight
@@ -325,6 +326,7 @@ document.addEventListener("DOMContentLoaded", ->
     applyHomePage()
     setElementTranslate(ui.board, new Point(ui.root.positionLimit.x + 768, 0))
     ui.root.appendChild(ui.board)
-    translateToAnimate(ui.board, new Point(0, 0), null, 750, 2000, elasticTimingFunctionGenerator(30, 600, 5))
+    translateAnimate(ui.board, undefined, new Point(0, 0), undefined, 750, 2000,
+            elasticTimingFunctionGenerator(30, 600, 5))
 )
 setDebugVariables()

@@ -25,15 +25,13 @@ class Game
     @COLOR_EMPTY: 0
     @COLOR_BLACK: 1
     @COLOR_WHITE: 2
-    that = undefined
     constructor: (@size, @firstColor) ->
-        that = @
         @secondColor = Game.getOpposite(firstColor)
         @moves = []
         @_board = @_createBoard()
         @_chains = []
     class Chain
-        constructor: (@color) -> @positions = [] # chain内的棋子的坐标
+        constructor: (@game, @color) -> @positions = [] # chain内的棋子的坐标
         getLiberties: ->
             result = []
             tryPush = (pos) =>
@@ -44,13 +42,13 @@ class Game
                 pos = @positions[i]
                 x = pos.x
                 y = pos.y
-                if x != 0 and that._board[x - 1][y].color == Game.COLOR_EMPTY
+                if x != 0 and @game._board[x - 1][y].color == Game.COLOR_EMPTY
                     tryPush(new Point(x - 1, y))
-                if x != that.size - 1 and that._board[x + 1][y].color == Game.COLOR_EMPTY
+                if x != @game.size - 1 and @game._board[x + 1][y].color == Game.COLOR_EMPTY
                     tryPush(new Point(x + 1, y))
-                if y != 0 and that._board[x][y - 1].color == Game.COLOR_EMPTY
+                if y != 0 and @game._board[x][y - 1].color == Game.COLOR_EMPTY
                     tryPush(new Point(x, y - 1))
-                if y != that.size - 1 and that._board[x][y + 1].color == Game.COLOR_EMPTY
+                if y != @game.size - 1 and @game._board[x][y + 1].color == Game.COLOR_EMPTY
                     tryPush(new Point(x, y + 1))
             result
         merge: (chainsToMerge) ->
@@ -58,11 +56,11 @@ class Game
                 chain = chainsToMerge[i]
                 for j in [0...chain.positions.length]
                     pos = chain.positions[j]
-                    that._getBoardItem(pos).chain = @
+                    @game._getBoardItem(pos).chain = @
                     @positions.push(pos)
-                that._chains.splice(that._chains.indexOf(chain), 1)
+                @game._chains.splice(@game._chains.indexOf(chain), 1)
         clone: ->
-            newChain = new Chain(@color)
+            newChain = new Chain(@game, @color)
             newPositions = newChain.positions
             for i in [0...@positions.length]
                 pos = @positions[i]
@@ -190,7 +188,7 @@ class Game
         pos = stone.position
         chainsToUse = @_getAdjacentChains(pos, color)
         if chainsToUse.length == 0
-            chain = new Chain(color)
+            chain = new Chain(@, color)
             @_chains.push(chain)
         else if chainsToUse.length == 1
             chain = chainsToUse[0]
