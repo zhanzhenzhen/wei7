@@ -295,7 +295,7 @@ applyHomePage = ->
         addSquareButton("回", new Point(0, 0), -> initBoard(19, applyHomePage))
     ))
     addSquareButton("机", new Point(-160, 224), -> initBoard(19, ->
-        game = new Game(19, Game.COLOR_BLACK)
+        game = new LegalGame(19, 7.5)
     ))
     addSquareButton("学", new Point(0, 224), -> initBoard(19))
     addSquareButton("谱", new Point(160, 224), -> initBoard(19))

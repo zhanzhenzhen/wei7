@@ -15,7 +15,7 @@ VisualUnit指棋盘上的一个视觉意义上的单元，也就是一个点，�
 Stone指具体的某颗棋子，即某个非空的VisualUnit。
 Snapshot指整个棋盘的快照，即局面（“局面”在英语中应为position，但我们这里position有其他含义）
 State指整个棋盘的全部状态（包括chains等内部状态）。
-move指一步棋，它在VisualUnit的基础上增加了可选的previousState。
+move指一步棋，它在VisualUnit的基础上增加了可选的previousState和captures。
 Chain指一块棋，即竖直方向或水平方向相连的所有棋子的集合。它有一些属性和方法，比较复杂。
 liberty指气，指具体的某一口气，它是一个position。
 其次是对一些词语的解释：
@@ -105,6 +105,7 @@ class Game
         @_chains = []
     playMove: (move) ->
         move.previousState = @_cloneState()
+        move.captures = []
         pos = move.position # pos如为null则代表pass
         if pos == null
             @moves.push(move)
@@ -133,6 +134,7 @@ class Game
                             boardItem = @_getBoardItem(item)
                             boardItem.color = Game.COLOR_EMPTY
                             boardItem.chain = null
+                            move.captures.push(item)
                         @_chains.splice(@_chains.indexOf(chain), 1)
                         hasCaptures = true
             # )*****
@@ -145,6 +147,7 @@ class Game
         @_board = move.previousState.board
         @_chains = move.previousState.chains
         @moves.splice(@moves.length - 1, 1)
+    getLastMove: -> if @moves.length == 0 then null else @moves[@moves.length - 1]
     _getBoardItem: (pos) -> @_board[pos.x][pos.y]
     _createBoard: ->
         board = []
