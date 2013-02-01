@@ -8,7 +8,7 @@ Game类实现了最底层的棋局。它既可以表示正在播放的棋谱中�
     不强制交替下子的原因也一样。而且有些搞笑的“勺子”棋谱恰恰就有这些情况出现。
 首先是一些要素：
 Color指“颜色”，即黑、白、空三者之一。
-Position指棋盘上一个点的坐标，含x,y属性。
+Position指棋盘上一个点的坐标，含x,y属性。基本上就等于Point，但使用场合有些差异。
 VisualUnit指棋盘上的一个视觉意义上的单元，也就是一个点，它含有color（表示该点目前的状态）
 和position两个属性。
     注意：如果position为null，则通常应该用来表示pass。
@@ -42,13 +42,13 @@ class Game
                 pos = @positions[i]
                 x = pos.x
                 y = pos.y
-                if x != 0 and @game._board[x - 1][y].color == Game.COLOR_EMPTY
+                if x != 0 and @game._getBoardItemFromXY(x - 1, y).color == Game.COLOR_EMPTY
                     tryPush(new Point(x - 1, y))
-                if x != @game.size - 1 and @game._board[x + 1][y].color == Game.COLOR_EMPTY
+                if x != @game.size - 1 and @game._getBoardItemFromXY(x + 1, y).color == Game.COLOR_EMPTY
                     tryPush(new Point(x + 1, y))
-                if y != 0 and @game._board[x][y - 1].color == Game.COLOR_EMPTY
+                if y != 0 and @game._getBoardItemFromXY(x, y - 1).color == Game.COLOR_EMPTY
                     tryPush(new Point(x, y - 1))
-                if y != @game.size - 1 and @game._board[x][y + 1].color == Game.COLOR_EMPTY
+                if y != @game.size - 1 and @game._getBoardItemFromXY(x, y + 1).color == Game.COLOR_EMPTY
                     tryPush(new Point(x, y + 1))
             result
         merge: (chainsToMerge) ->
@@ -74,25 +74,12 @@ class Game
         else
             fail("No opposite.")
     @compareSnapshots: (oldSnapshot, newSnapshot) ->
-        size = oldSnapshot.length # 用newSnapshot.length等等也可以
-        diff = []
-        for x in [0...size]
-            for y in [0...size]
-                itemNew = newSnapshot[x][y]
-                itemOld = oldSnapshot[x][y]
-                if itemNew != itemOld
-                    diff.push({color: itemNew, position: new Point(x, y)})
-        diff
-    getBoardSnapshot: ->
-        snapshot = []
-        snapshot.length = @size
-        for x in [0...@size]
-            col = []
-            col.length = @size
-            for y in [0...@size]
-                col[y] = @_board[x][y].color
-            snapshot[x] = col
-        snapshot
+        size = Math.round(Math.sqrt(newSnapshot.length))
+        (
+            color: m
+            position: new Point(i % size, Math.floor(i / size))
+        ) for m, i in newSnapshot when m != oldSnapshot[i]
+    getBoardSnapshot: -> m.color for m in @_board
     getNextColor: ->
         if @moves.length % 2 == 0 then @firstColor else @secondColor
     addStones: (stones) ->
@@ -148,27 +135,29 @@ class Game
         @_chains = move.previousState.chains
         @moves.splice(@moves.length - 1, 1)
     getLastMove: -> if @moves.length == 0 then null else @moves[@moves.length - 1]
-    _getBoardItem: (pos) -> @_board[pos.x][pos.y]
-    _createBoard: ->
-        board = []
-        board.length = @size
-        for i in [0...@size]
-            col = []
-            col.length = @size
-            for j in [0...@size]
-                col[j] = {color: Game.COLOR_EMPTY, chain: null}
-            board[i] = col
-        board
+    getColor: (point) -> @_getBoardItem(point).color
+    getColorFromIndex: (index) -> @_board(index).color
+    getColorFromXY: (x, y) -> @_getBoardItemFromXY(x, y).color
+    getPointsInColor: (color) -> @convertIndexToPoint(i) for m, i in @_board when m.color == color
+    convertPointToIndex: (point) -> point.y * @size + point.x
+    convertIndexToPoint: (index) -> new Point(index % @size, Math.floor(index / @size))
+    _getBoardItem: (point) -> @_getBoardItemFromXY(point.x, point.y)
+    _getBoardItemFromXY: (x, y) -> @_board[y * @size + x]
+    _createBoard: -> {color: Game.COLOR_EMPTY, chain: null} for i in [0...@size * @size]
     # 属于color一方的与pos相邻的所有的chain（显然最多可以有4个）
     _getAdjacentChains: (pos, color) ->
         tryPush = (chain) => if result.indexOf(chain) == -1 then result.push(chain)
         x = pos.x
         y = pos.y
         result = []
-        if x != 0 and @_board[x - 1][y].color == color then tryPush(@_board[x - 1][y].chain)
-        if x != @size - 1 and @_board[x + 1][y].color == color then tryPush(@_board[x + 1][y].chain)
-        if y != 0 and @_board[x][y - 1].color == color then tryPush(@_board[x][y - 1].chain)
-        if y != @size - 1 and @_board[x][y + 1].color == color then tryPush(@_board[x][y + 1].chain)
+        if x != 0 and @_getBoardItemFromXY(x - 1, y).color == color
+            tryPush(@_getBoardItemFromXY(x - 1, y).chain)
+        if x != @size - 1 and @_getBoardItemFromXY(x + 1, y).color == color
+            tryPush(@_getBoardItemFromXY(x + 1, y).chain)
+        if y != 0 and @_getBoardItemFromXY(x, y - 1).color == color
+            tryPush(@_getBoardItemFromXY(x, y - 1).chain)
+        if y != @size - 1 and @_getBoardItemFromXY(x, y + 1).color == color
+            tryPush(@_getBoardItemFromXY(x, y + 1).chain)
         result
     _cloneState: ->
         newBoard = @_createBoard()
@@ -178,7 +167,7 @@ class Game
             newChain = chain.clone()
             for j in [0...chain.positions.length]
                 pos = chain.positions[j]
-                newBoardItem = newBoard[pos.x][pos.y]
+                newBoardItem = newBoard[@convertPointToIndex(pos)]
                 newBoardItem.color = newChain.color
                 newBoardItem.chain = newChain
             newChains.push(newChain)

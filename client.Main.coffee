@@ -30,7 +30,11 @@ codifyElement(ui, """
             </g>
         </g>
         <rect id="boardInput" x="-512" y="-512" width="1024" height="1024" opacity="0" cursor="crosshair" />
-        <g id="boardDialog" />
+        <g id="boardDialogContainer">
+            <rect id="boardDialogBackground" x="-512" y="-512" width="1024" height="1024"
+                    fill="rgb(224,224,224)" />
+            <g id="boardDialog" />
+        </g>
     </g>
 """)
 codifyElement(ui, """
@@ -74,11 +78,28 @@ addSquareButton = (text, position, clickHandler) ->
     element.addEventListener("click", clickHandler) if clickHandler?
     ui.boardDialog.appendChild(element)
     element
+addButton = (text, position, clickHandler) ->
+    element = parseElement("""
+        <g transform="translate(#{position.x},#{position.y})" cursor="pointer"
+                xmlns="http://www.w3.org/2000/svg">
+            <rect x="-104" y="-52" width="208" height="104" opacity="0.8"
+                    fill="rgb(0,128,255)" stroke="rgb(255,255,255)" stroke-width="3" />
+            <text x="0" y="20" fill="rgb(255,255,255)" font-size="56" text-anchor="middle" />
+        </g>
+    """)
+    element.getElementsByTagName("text")[0].textContent = text
+    element.addEventListener("click", clickHandler) if clickHandler?
+    ui.boardDialog.appendChild(element)
+    element
 emptyElement = (element) -> element.textContent = ""
 showElement = (element) -> element.setAttribute("visibility", "visible")
 hideElement = (element) -> element.setAttribute("visibility", "hidden")
 isElementVisible = (element) ->
     if window.getComputedStyle(element).visibility == "hidden" then false else true
+showDialog = (bgOpacity) ->
+    ui.boardDialogBackground.setAttribute("opacity", "#{bgOpacity ? 0.75}")
+    showElement(ui.boardDialogContainer)
+hideDialog = -> hideElement(ui.boardDialogContainer)
 buildBoard = ->
     ui.board.marginFactor = 0.728
     ui.board.gridlineWidthFactor = 0.057
@@ -97,6 +118,7 @@ buildBoard = ->
         emptyElement(ui.boardStones)
         emptyElement(ui.boardMarks)
         emptyElement(ui.boardDialog)
+        hideDialog()
         ui.board.setActiveStone(null)
         ui.board.size = size
         ui.board.unitLength = calcUnitLength(19)
@@ -282,6 +304,9 @@ setDebugVariables = ->
     d.Point = Point
     d.Game = Game
     d.LegalGame = LegalGame
+    window.setInterval(->
+        d.game = game
+    , 500)
 refreshForResize = ->
     w = window.innerWidth
     h = window.innerHeight
@@ -291,15 +316,22 @@ refreshForResize = ->
         ui.root.positionLimit = ui.root.convertPointFromClient(new Point(w, h))
 applyHomePage = ->
     ui.board.addWelcomeStones()
-    addSquareButton("人", new Point(-320, 224), -> initBoard(19, ->
-        addSquareButton("回", new Point(0, 0), -> initBoard(19, applyHomePage))
+    addSquareButton("网", new Point(-320, 224), -> initBoard(19, ->
+        addButton("返回", new Point(0, 0), -> initBoard(19, applyHomePage))
+        showDialog()
     ))
-    addSquareButton("机", new Point(-160, 224), -> initBoard(19, ->
+    addSquareButton("闲", new Point(-160, 224), -> initBoard(19, ->
+        addButton("返回", new Point(0, -160), -> hideDialog())
+        addButton("Pass", new Point(0, 0), -> hideDialog())
+        addButton("认输", new Point(0, 160), -> hideDialog())
         game = new LegalGame(19, 7.5)
     ))
-    addSquareButton("学", new Point(0, 224), -> initBoard(19))
-    addSquareButton("谱", new Point(160, 224), -> initBoard(19))
-    addSquareButton("?", new Point(320, 224), undefined)
+    addSquareButton("闯", new Point(0, 224), -> initBoard(19))
+    addSquareButton("学", new Point(160, 224), -> initBoard(19))
+    addSquareButton("谱", new Point(320, 224), -> initBoard(19))
+    helpButton = addSquareButton("?", new Point(0, 384), undefined)
+    setElementScale(helpButton, 0.5)
+    showDialog(0)
 document.addEventListener("DOMContentLoaded", ->
     svgPoint = (x, y) ->
         p = ui.root.createSVGPoint()
@@ -315,6 +347,11 @@ document.addEventListener("DOMContentLoaded", ->
         p1 = svgPoint(p.x, p.y)
         p2 = p1.matrixTransform(ui.root.getScreenCTM().inverse())
         new Point(p2.x, p2.y)
+    ui.root.addEventListener("click", (event) ->
+        p = ui.root.convertPointFromClient(new Point(event.clientX, event.clientY))
+        if not (-512 <= p.x <= 512 and -512 <= p.y <= 512) and game != null
+            showDialog()
+    )
     window.addEventListener("resize", refreshForResize)
     refreshForResize()
     ui.root.appendChild(ui.blackStoneGradient)

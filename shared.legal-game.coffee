@@ -43,3 +43,45 @@ class LegalGame extends Game
                         @undo()
                         fail("Illegal move.")
     calculateScore: ->
+        seeableColor = (point, unitDirection) =>
+            p = point
+            loop
+                p = p.add(unitDirection)
+                if not (0 <= p.x < @size and 0 <= p.y < @size) then return null
+                color = @getColor(p)
+                if color != Game.COLOR_EMPTY then return color
+        blackScore = 0
+        whiteScore = 0
+        for color, i in @getBoardSnapshot()
+            if color == Game.COLOR_BLACK
+                blackScore++
+            else if color == Game.COLOR_WHITE
+                whiteScore++
+            else
+                p = @convertIndexToPoint(i)
+                seeableColors = [
+                    seeableColor(p, new Point(1, 0))
+                    seeableColor(p, new Point(-1, 0))
+                    seeableColor(p, new Point(0, 1))
+                    seeableColor(p, new Point(0, -1))
+                ]
+                if seeableColors.some((m) -> m == Game.COLOR_BLACK) and
+                        seeableColors.every((m) -> m != Game.COLOR_WHITE)
+                    blackScore++
+                else if seeableColors.some((m) -> m == Game.COLOR_WHITE) and
+                        seeableColors.every((m) -> m != Game.COLOR_BLACK)
+                    whiteScore++
+                else
+                    blackScore += 0.5
+                    whiteScore += 0.5
+        blackMargin = blackScore - whiteScore - @komi
+        black: blackScore
+        white: whiteScore
+        winner:
+            if blackMargin > 0
+                Game.COLOR_BLACK
+            else if blackMargin < 0
+                Game.COLOR_WHITE
+            else
+                null
+        margin: Math.abs(blackMargin)
