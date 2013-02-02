@@ -1,7 +1,10 @@
 class LegalGame extends Game
     constructor: (size, @komi) ->
         super(size, Game.COLOR_BLACK)
-    playMove: (move) ->
+        @_isEnded = false
+    playMove: (position) ->
+        if @_isEnded then fail("Game already ended.")
+        move = {color: @getNextColor(), position: position}
         lastMove = @getLastMove()
         lastButOneMove = if @moves.length < 2 then null else @moves[@moves.length - 2]
         super(move)
@@ -42,6 +45,20 @@ class LegalGame extends Game
                     ) and p32.equal(p21)
                         @undo()
                         fail("Illegal move.")
+        if lastMove != null and lastMove.position == null and move.position == null
+            @_isEnded = true
+    setResult: (winner, margin) ->
+        if @_result != undefined then fail("Game result already set.")
+        @_isEnded = true
+        @_result = {winner: winner, margin: margin}
+    getResult: ->
+        if @_result == undefined
+            undefined
+        else
+            {winner: @_result.winner, margin: @_result.margin}
+    end: -> @_isEnded = true
+    isEnded: -> @_isEnded
+    resign: -> @setResult(Game.getOpposite(@getNextColor()), null)
     calculateScore: ->
         seeableColor = (point, unitDirection) =>
             p = point

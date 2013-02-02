@@ -9,7 +9,7 @@ animate = (syncTime, callback) ->
     syncTime ?= window.performance.now()
     window.requestAnimationFrame(f)
 # 基于animate
-delay = (syncTime, duration, callback) ->
+delayAnimate = (syncTime, duration, callback) ->
     animate(syncTime, (time) ->
         if time >= duration
             callback()
@@ -60,6 +60,20 @@ scaleAnimate = (element, startScale, endScale, syncTime, startTime, duration,
             startScale ?= getElementScale(element)
         if element.currentScaleAnimation == token
             setElementScale(element, animatedValue(startScale, endScale, duration, time, timingFunction))
+        else
+            false
+    , endCallback)
+# 基于timespanAnimate。用令牌机制防止一个element同时运行多个rotate动画。
+rotateAnimate = (element, startRotate, endRotate, syncTime, startTime, duration,
+        timingFunction, endCallback) ->
+    token = undefined
+    timespanAnimate(syncTime, startTime, duration, (time) ->
+        if token == undefined
+            token = {}
+            element.currentRotateAnimation = token
+            startRotate ?= getElementRotate(element)
+        if element.currentRotateAnimation == token
+            setElementRotate(element, animatedValue(startRotate, endRotate, duration, time, timingFunction))
         else
             false
     , endCallback)

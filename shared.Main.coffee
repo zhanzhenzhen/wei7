@@ -1,4 +1,7 @@
 fail = (errorMessage) -> throw new Error(errorMessage)
+# 返回一个大于等于0且小于n的随机整数
+randomInt = (n) -> Math.floor(Math.random() * n)
+randomItemInArray = (array) -> array[randomInt(array.length)]
 # 这个类既可表示一个“点”，也可表示一个“向量”，因本质上都是两个数字（有序对）
 class Point
     constructor: (@x, @y) ->
