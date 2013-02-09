@@ -79,7 +79,16 @@ class Game
             color: m
             position: new Point(i % size, Math.floor(i / size))
         ) for m, i in newSnapshot when m != oldSnapshot[i]
+    isPointInBoard: (p) -> 0 <= p.x < @size and 0 <= p.y < @size
+    getAdjacentPoints: (p) ->
+        m for m in [
+            new Point(p.x - 1, p.y),
+            new Point(p.x + 1, p.y),
+            new Point(p.x, p.y - 1),
+            new Point(p.x, p.y + 1)
+        ] when @isPointInBoard(m)
     getBoardSnapshot: -> m.color for m in @_board
+    getExtensibleBoardSnapshot: -> {color: m.color} for m in @_board
     getNextColor: ->
         if @moves.length % 2 == 0 then @firstColor else @secondColor
     addStones: (stones) ->

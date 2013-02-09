@@ -60,37 +60,35 @@ class LegalGame extends Game
     isEnded: -> @_isEnded
     resign: -> @setResult(Game.getOpposite(@getNextColor()), null)
     calculateScore: ->
-        seeableColor = (point, unitDirection) =>
-            p = point
-            loop
-                p = p.add(unitDirection)
-                if not (0 <= p.x < @size and 0 <= p.y < @size) then return null
-                color = @getColor(p)
-                if color != Game.COLOR_EMPTY then return color
-        blackScore = 0
-        whiteScore = 0
-        for color, i in @getBoardSnapshot()
-            if color == Game.COLOR_BLACK
-                blackScore++
-            else if color == Game.COLOR_WHITE
-                whiteScore++
+        getConnectedPoints = (point) =>
+            visited = []
+            points = []
+            traverse = (point) =>
+                points.push(point)
+                index = @convertPointToIndex(point)
+                visited[index] = true
+                traverse(m) for m in @getAdjacentPoints(point) \
+                        when not visited[@convertPointToIndex(m)] and \
+                        @getColor(m) == Game.COLOR_EMPTY
+            traverse(point)
+            points
+        snapshot = @getExtensibleBoardSnapshot()
+        blackScore = @getPointsInColor(Game.COLOR_BLACK).length
+        whiteScore = @getPointsInColor(Game.COLOR_WHITE).length
+        loop
+            remaining = (i for m, i in snapshot when m.color == Game.COLOR_EMPTY and not m.dirty)
+            if remaining.length == 0 then break
+            enclosed = getConnectedPoints(@convertIndexToPoint(remaining[0]))
+            snapshot[@convertPointToIndex(i)].dirty = true for i in enclosed
+            if enclosed.some((m) => @getAdjacentPoints(m).some((n) => @getColor(n) == Game.COLOR_BLACK)) and
+                    enclosed.every((m) => @getAdjacentPoints(m).every((n) => @getColor(n) != Game.COLOR_WHITE))
+                blackScore += enclosed.length
+            else if enclosed.some((m) => @getAdjacentPoints(m).some((n) => @getColor(n) == Game.COLOR_WHITE)) and
+                    enclosed.every((m) => @getAdjacentPoints(m).every((n) => @getColor(n) != Game.COLOR_BLACK))
+                whiteScore += enclosed.length
             else
-                p = @convertIndexToPoint(i)
-                seeableColors = [
-                    seeableColor(p, new Point(1, 0))
-                    seeableColor(p, new Point(-1, 0))
-                    seeableColor(p, new Point(0, 1))
-                    seeableColor(p, new Point(0, -1))
-                ]
-                if seeableColors.some((m) -> m == Game.COLOR_BLACK) and
-                        seeableColors.every((m) -> m != Game.COLOR_WHITE)
-                    blackScore++
-                else if seeableColors.some((m) -> m == Game.COLOR_WHITE) and
-                        seeableColors.every((m) -> m != Game.COLOR_BLACK)
-                    whiteScore++
-                else
-                    blackScore += 0.5
-                    whiteScore += 0.5
+                blackScore += enclosed.length / 2
+                whiteScore += enclosed.length / 2
         blackMargin = blackScore - whiteScore - @komi
         black: blackScore
         white: whiteScore

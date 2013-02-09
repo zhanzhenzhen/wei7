@@ -40,9 +40,4 @@ class GameHelper
         diff = Game.compareSnapshots(oldSnapshot, newSnapshot)
         ui.board.updateStones(diff, true)
         ui.board.setActiveStone(point)
-        if context.scene.mode == "rush" and game.getNextColor() == Game.COLOR_WHITE
-            ui.board.isBlocked = true
-            window.setTimeout(->
-                GameHelper.playMoveInBoard(GameHelper.randomBot(game))
-                ui.board.isBlocked = false
-            , 1000)
+        context.postMoveHook?()

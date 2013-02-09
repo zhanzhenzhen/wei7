@@ -5,13 +5,19 @@ ui.board.starRadiusFactor = 0.114
 ui.board.stoneSizeFactor = 0.94
 # callback在棋盘“消失”动画后“出现”动画前被调用，它可以包含对新棋盘将要显示的按钮、棋子等的绘画语句
 ui.board.init = (size, callback) ->
+    hideElement(ui.info1)
+    hideElement(ui.info2)
     translateAnimate(
         ui.board, undefined, new Point(-ui.root.positionLimit.x - 768, 0),
         undefined, 0, 500, easeTimingFunction, ->
             ui.board.make(size)
             callback?()
-            translateAnimate(ui.board, new Point(ui.root.positionLimit.x + 768, 0), new Point(0, 0),
-                    undefined, 0, 500, easeTimingFunction)
+            translateAnimate(
+                ui.board, new Point(ui.root.positionLimit.x + 768, 0), new Point(0, 0),
+                undefined, 0, 500, easeTimingFunction, ->
+                    showElement(ui.info1)
+                    showElement(ui.info2)
+            )
     )
 ui.board.axisValue = (index) -> -ui.board.axisValueLimit + ui.board.margin + index * ui.board.unitLength
 ui.board.mapPointToUI = (gamePoint) ->
@@ -147,11 +153,3 @@ ui.board.showDialog = (bgOpacity) ->
     ui.boardDialogBackground.setAttribute("opacity", "#{bgOpacity ? 0.75}")
     showElement(ui.boardDialogContainer)
 ui.board.hideDialog = -> hideElement(ui.boardDialogContainer)
-ui.boardInput.addEventListener("click", (event) ->
-    if context.game != null and not ui.board.isBlocked
-        point = ui.board.mapPointFromUI(
-            ui.root.convertPointFromClient(new Point(event.clientX, event.clientY))
-        )
-        if 0 <= point.x < ui.board.size and 0 <= point.y < ui.board.size
-            GameHelper.playMoveInBoard(point)
-)

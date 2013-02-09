@@ -43,6 +43,12 @@ httpModule.createServer((request, response) ->
                         response.writeHead(200, {"Content-Type": "application/xhtml+xml"})
                         response.end(data)
                     )
+            when "/wei7help.pdf"
+                fsModule.readFile("wei7help.pdf", (error, data) ->
+                    checkError(error)
+                    response.writeHead(200, {"Content-Type": "application/pdf"})
+                    response.end(data)
+                )
             when "/wei7spec.pdf"
                 fsModule.readFile("wei7spec.pdf", (error, data) ->
                     checkError(error)
@@ -53,12 +59,6 @@ httpModule.createServer((request, response) ->
                 fsModule.readFile("client.js", (error, data) ->
                     checkError(error)
                     response.writeHead(200, {"Content-Type": "application/javascript"})
-                    response.end(data)
-                )
-            when "/wood.jpg"
-                fsModule.readFile("wood.jpg", (error, data) ->
-                    checkError(error)
-                    response.writeHead(200, {"Content-Type": "image/jpeg"})
                     response.end(data)
                 )
             else
