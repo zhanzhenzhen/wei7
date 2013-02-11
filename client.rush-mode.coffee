@@ -55,7 +55,7 @@ sceneMaker["rush"] = ->
         """)
         hintLabel = info2Table.getElementsByTagName("td")[0]
         hintLabel.style.fontSize = "1.3em"
-        hintLabel.style.color = "rgb(96,96,96)"
+        hintLabel.style.color = "rgb(104,104,104)"
         hintLabel.textContent = "您必须在10分钟内吃掉所有的白子。电脑会随机落子。" +
             "当您完成后，在屏幕空白处点一下，再点击Pass即可。吃得越多，则得分越高。加油！"
         ui.info2.appendChild(info2Table)

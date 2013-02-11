@@ -150,6 +150,9 @@ ui.board.updateStones = (diff, useAnimation) ->
         else
             ui.board.addStone(item.color, item.position, useAnimation)
 ui.board.showDialog = (bgOpacity) ->
+    ui.board.isInDialog = true
     ui.boardDialogBackground.setAttribute("opacity", "#{bgOpacity ? 0.75}")
     showElement(ui.boardDialogContainer)
-ui.board.hideDialog = -> hideElement(ui.boardDialogContainer)
+ui.board.hideDialog = ->
+    ui.board.isInDialog = false
+    hideElement(ui.boardDialogContainer)

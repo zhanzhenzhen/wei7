@@ -1,5 +1,9 @@
 initUIElements = ->
     codifyElement(ui, """
+        <rect id="outsideInput" x="-2" y="-2" width="4" height="4" fill="rgba(0,0,0,0)"
+                xmlns="http://www.w3.org/2000/svg" />
+    """)
+    codifyElement(ui, """
         <g id="board" xmlns="http://www.w3.org/2000/svg">
             <rect x="-512" y="-512" width="1024" height="1024" fill="rgb(219,179,119)" />
             <g id="boardLoads">

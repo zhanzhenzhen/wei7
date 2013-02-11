@@ -71,3 +71,90 @@ setElementRotate = (element, value) ->
         else
             currentRotates[currentRotates.length - 1]
     rotate.setRotate(value, 0, 0)
+isInputInElement = (element, event) ->
+    # 仅判断event.target是不够的，因为所有touchmove和touchend的target都和其
+    # 对应的touchstart相同，无论手指是否移到了元素的外面。
+    if element.contains(event.target) and
+            element.contains(document.elementFromPoint(event.clientX, event.clientY))
+        true
+    else
+        false
+setElementClickHandler = (element, handler, threshold) ->
+    threshold ?= 2000
+    startTime = null
+    if isTouchDevice
+        element.addEventListener("touchstart", (event) ->
+            if event.touches.length == 1 and isInputInElement(element, event.changedTouches[0])
+                startTime = window.performance.now()
+            else
+                startTime = null
+        )
+        element.addEventListener("touchmove", (event) ->
+            if not (event.touches.length == 1 and isInputInElement(element, event.changedTouches[0]))
+                startTime = null
+        )
+        element.addEventListener("touchend", (event) ->
+            if startTime? and event.touches.length == 0 and
+                    isInputInElement(element, event.changedTouches[0]) and
+                    window.performance.now() - startTime < threshold
+                handler(event.changedTouches[0])
+            startTime = null
+        )
+    else
+        element.addEventListener("mousedown", (event) ->
+            if isInputInElement(element, event)
+                startTime = window.performance.now()
+            else
+                startTime = null
+        )
+        element.addEventListener("mousemove", (event) ->
+            if not isInputInElement(element, event)
+                startTime = null
+        )
+        element.addEventListener("mouseup", (event) ->
+            if startTime? and isInputInElement(element, event) and
+                    window.performance.now() - startTime < threshold
+                handler(event)
+            startTime = null
+        )
+setElementHoldHandler = (element, handler, threshold) ->
+    threshold ?= 800
+    timeoutID = null
+    setDelay = ->
+        timeoutID = window.setTimeout(handler, threshold)
+    clearDelay = ->
+        window.clearTimeout(timeoutID) if timeoutID?
+        timeoutID = null
+    if isTouchDevice
+        element.addEventListener("touchstart", (event) ->
+            if event.touches.length == 1 and isInputInElement(element, event.changedTouches[0])
+                clearDelay()
+                setDelay()
+            else
+                clearDelay()
+        )
+        element.addEventListener("touchmove", (event) ->
+            if not (event.touches.length == 1 and isInputInElement(element, event.changedTouches[0]))
+                clearDelay()
+        )
+        element.addEventListener("touchend", ->
+            clearDelay()
+        )
+    else
+        element.addEventListener("mousedown", (event) ->
+            if isInputInElement(element, event)
+                clearDelay()
+                setDelay()
+            else
+                clearDelay()
+        )
+        element.addEventListener("mousemove", (event) ->
+            if not isInputInElement(element, event)
+                clearDelay()
+        )
+        element.addEventListener("mouseleave", ->
+            clearDelay()
+        )
+        element.addEventListener("mouseup", ->
+            clearDelay()
+        )

@@ -15,3 +15,11 @@ if window.performance == undefined
 if window.requestAnimationFrame == undefined and window.webkitRequestAnimationFrame != undefined
     window.requestAnimationFrame = (callback) ->
         window.webkitRequestAnimationFrame((time) -> callback(time - window.performance.timing.navigationStart))
+# IE 10不支持所有SVG元素的contains方法（它只支持HTML元素的，它的contains方法
+# 并不是如W3C所要求的那样建立在Node之上）。我们在IE 10中模拟它，功能从简（只支持元素对元素）。
+if SVGElement::contains == undefined
+    SVGElement::contains = (element) ->
+        if element == @ then return true
+        for item in @getElementsByTagName("*")
+            if item == element then return true
+        return false

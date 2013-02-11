@@ -8,7 +8,7 @@ ui.board.addSquareButton = (text, position, clickHandler) ->
         </g>
     """)
     element.getElementsByTagName("text")[0].textContent = text
-    element.addEventListener("click", clickHandler) if clickHandler?
+    setElementClickHandler(element, clickHandler) if clickHandler?
     ui.boardDialog.appendChild(element)
     element
 ui.board.addButton = (text, position, clickHandler) ->
@@ -21,7 +21,7 @@ ui.board.addButton = (text, position, clickHandler) ->
         </g>
     """)
     element.getElementsByTagName("text")[0].textContent = text
-    element.addEventListener("click", clickHandler) if clickHandler?
+    setElementClickHandler(element, clickHandler) if clickHandler?
     ui.boardDialog.appendChild(element)
     element
 ui.board.addLabel = (text, position, fontSize) ->

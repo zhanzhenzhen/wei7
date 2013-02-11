@@ -17,3 +17,10 @@ formatTimespan = (seconds, hasHour, isFirstFixed) ->
             "#{twoDigits(m)}:#{twoDigits(s)}"
         else
             "#{m}:#{twoDigits(s)}"
+preventDefaultEventHandler = (event) -> event.preventDefault()
+isTouchDevice = do ->
+    try
+        document.createEvent("TouchEvent")
+        true
+    catch e
+        false
