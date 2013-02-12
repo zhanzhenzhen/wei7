@@ -1,0 +1,884 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wei7 version="2.2">
+  <size>19</size>
+  <game name="学习围棋" />
+  <moves>
+    <pre title="目录" />
+    <moves>
+      <pre title="如何吃子" />
+      <moves>
+        <pre title="吃子示例1" comment="黑棋该怎么走，才能吃掉这颗白子？" problem="black">
+          <white x="9" y="9" />
+          <black x="8" y="9" />
+          <black x="10" y="9" />
+          <black x="9" y="8" />
+        </pre>
+        <black x="9" y="10" eval="good" />
+      </moves>
+      <moves>
+        <pre title="吃子示例2" comment="黑棋该怎么走，才能吃掉所有的白子？" problem="black">
+          <white x="0" y="0" />
+          <white x="1" y="0" />
+          <white x="2" y="0" />
+          <white x="3" y="0" />
+          <white x="4" y="0" />
+          <black x="0" y="1" />
+          <black x="1" y="1" />
+          <black x="2" y="1" />
+          <black x="3" y="1" />
+          <black x="4" y="1" />
+        </pre>
+        <black x="5" y="0" eval="good" />
+      </moves>
+    </moves>
+    <moves>
+      <pre title="怎样判断胜负" comment="这局棋是黑棋赢还是白棋赢呢？
+
+答案：
+黑方占据了棋盘左边的地域，白方占据了棋盘右边的地域。我们来数一下谁占得多。
+数下来，黑棋共占了190个点，白棋共占了171个点（注意双方所围的空点也计算在内）。黑棋比白棋多了19个点。我们就说，在中国规则下，黑棋赢了11.5目。
+“什么？等等……赢了11.5目？不是19个点吗？”嘿嘿，因为在围棋规则中，由于黑棋先走，而先走的一方是有一定优势的，所以最后算的时候，黑棋要减去7.5个点。19-7.5=11.5，所以赢的点数是11.5。按照专业的说法，赢的点数称为“目”，所以说黑棋赢了11.5目。
+而如果盘面上黑棋只比白棋多7个点，那么实际就是白棋反而赢了0.5目（大家拿黑棋可别下成这样哦，呵呵）。">
+        <black x="9" y="0" />
+        <black x="9" y="1" />
+        <black x="9" y="2" />
+        <black x="9" y="3" />
+        <black x="9" y="4" />
+        <black x="9" y="5" />
+        <black x="9" y="6" />
+        <black x="9" y="7" />
+        <black x="9" y="8" />
+        <black x="9" y="9" />
+        <black x="9" y="10" />
+        <black x="9" y="11" />
+        <black x="9" y="12" />
+        <black x="9" y="13" />
+        <black x="9" y="14" />
+        <black x="9" y="15" />
+        <black x="9" y="16" />
+        <black x="9" y="17" />
+        <black x="9" y="18" />
+        <white x="10" y="0" />
+        <white x="10" y="1" />
+        <white x="10" y="2" />
+        <white x="10" y="3" />
+        <white x="10" y="4" />
+        <white x="10" y="5" />
+        <white x="10" y="6" />
+        <white x="10" y="7" />
+        <white x="10" y="8" />
+        <white x="10" y="9" />
+        <white x="10" y="10" />
+        <white x="10" y="11" />
+        <white x="10" y="12" />
+        <white x="10" y="13" />
+        <white x="10" y="14" />
+        <white x="10" y="15" />
+        <white x="10" y="16" />
+        <white x="10" y="17" />
+        <white x="10" y="18" />
+        <black x="2" y="2" />
+        <black x="2" y="4" />
+        <black x="2" y="6" />
+        <black x="2" y="9" />
+        <black x="2" y="12" />
+        <black x="2" y="14" />
+        <black x="2" y="16" />
+        <black x="5" y="2" />
+        <black x="5" y="4" />
+        <black x="5" y="6" />
+        <black x="5" y="9" />
+        <black x="5" y="12" />
+        <black x="5" y="14" />
+        <black x="5" y="16" />
+        <white x="16" y="2" />
+        <white x="16" y="4" />
+        <white x="16" y="6" />
+        <white x="16" y="9" />
+        <white x="16" y="12" />
+        <white x="16" y="14" />
+        <white x="16" y="16" />
+        <white x="13" y="2" />
+        <white x="13" y="4" />
+        <white x="13" y="6" />
+        <white x="13" y="9" />
+        <white x="13" y="12" />
+        <white x="13" y="14" />
+        <white x="13" y="16" />
+      </pre>
+    </moves>
+    <moves>
+      <pre title="征子" comment="现在，轮到白棋走。如果白棋走在别的地方，那黑棋只要走在a处，白棋就彻底完蛋。所以为了救出这2颗白子，白棋只能走在a位。那么其后的发展如何呢？">
+        <white x="15" y="8" />
+        <white x="15" y="9" />
+        <black x="15" y="7" />
+        <black x="14" y="8" />
+        <black x="16" y="8" />
+        <black x="16" y="9" />
+        <black x="15" y="10" />
+        <mark x="14" y="9" symbol="a" />
+      </pre>
+      <white x="14" y="9" />
+      <black x="13" y="9" comment="现在，黑棋仍然是差一口气就可以吃掉白棋了。" />
+      <white x="14" y="10" />
+      <black x="14" y="11" />
+      <white x="13" y="10" />
+      <black x="12" y="10" />
+      <white x="13" y="11" />
+      <black x="13" y="12" />
+      <white x="12" y="11" />
+      <black x="11" y="11" />
+      <white x="12" y="12" />
+      <black x="12" y="13" />
+      <white x="11" y="12" />
+      <black x="10" y="12" />
+      <white x="11" y="13" />
+      <black x="11" y="14" />
+      <white x="10" y="13" />
+      <black x="9" y="13" />
+      <white x="10" y="14" />
+      <black x="10" y="15" />
+      <white x="9" y="14" />
+      <black x="8" y="14" />
+      <white x="9" y="15" />
+      <black x="9" y="16" />
+      <white x="8" y="15" />
+      <black x="7" y="15" />
+      <white x="8" y="16" />
+      <black x="8" y="17" />
+      <white x="7" y="16" />
+      <black x="6" y="16" />
+      <white x="7" y="17" />
+      <black x="7" y="18" />
+      <white x="6" y="17" />
+      <black x="5" y="17" />
+      <white x="6" y="18" />
+      <black x="5" y="18" comment="终于，白棋全部被吃了。这种长途跋涉的吃子方法就叫做“征子”。" />
+    </moves>
+    <moves>
+      <pre title="打劫">
+        <white x="14" y="7" />
+        <white x="13" y="8" />
+        <white x="15" y="8" />
+        <white x="14" y="9" />
+        <black x="15" y="7" />
+        <black x="16" y="8" />
+        <black x="15" y="9" />
+      </pre>
+      <black x="14" y="8" comment="黑棋现在吃掉了白棋。接下来白棋也想吃掉黑棋。" />
+      <moves>
+        <pre title="禁止的下法" comment="让我们想一下，如果白棋可以吃黑棋，会怎么样。" />
+        <white x="15" y="8" comment="嗯，现在似乎又回到一开始的局面了。然后呢？" />
+        <black x="14" y="8" />
+        <white x="15" y="8" comment="这样下去，永远也下不完。因此，在围棋规则中，这样的下法是禁止的。" />
+      </moves>
+      <moves>
+        <pre title="符合规则的下法" comment="这时白棋必须在其他地方下一子，然后再下一步才能下在这里。" />
+        <white x="5" y="5" />
+        <black x="7" y="5" />
+        <white x="15" y="8" />
+        <black x="5" y="13" />
+        <white x="7" y="13" />
+        <black x="14" y="8" />
+      </moves>
+    </moves>
+    <moves>
+      <pre title="角部常用定式" />
+      <moves>
+        <pre title="星定式">
+          <black x="15" y="3" />
+        </pre>
+        <moves>
+          <white x="13" y="2" eval="good" />
+          <moves>
+            <black x="16" y="5" eval="good" />
+            <moves>
+              <white x="15" y="1" eval="good" />
+              <moves>
+                <black x="16" y="2" eval="good" />
+                <moves>
+                  <white x="10" y="2" eval="good" />
+                </moves>
+              </moves>
+            </moves>
+          </moves>
+          <moves>
+            <black x="15" y="5" eval="good" />
+            <moves>
+              <white x="15" y="1" eval="good" />
+              <moves>
+                <black x="16" y="2" eval="good" />
+                <moves>
+                  <white x="10" y="2" eval="good" />
+                  <moves>
+                    <black x="16" y="9" eval="good" />
+                  </moves>
+                </moves>
+              </moves>
+            </moves>
+          </moves>
+          <moves>
+            <black x="11" y="2" eval="good" />
+            <moves>
+              <white x="16" y="2" eval="good" />
+              <moves>
+                <black x="15" y="2" eval="good" />
+                <moves>
+                  <white x="16" y="3" eval="good" />
+                  <moves>
+                    <black x="15" y="4" eval="good" />
+                    <moves>
+                      <white x="15" y="1" eval="good" />
+                      <moves>
+                        <black x="14" y="1" eval="good" />
+                        <moves>
+                          <white x="16" y="1" eval="good" />
+                          <moves>
+                            <black x="14" y="2" eval="good" />
+                            <moves>
+                              <white x="16" y="5" eval="good" />
+                              <moves>
+                                <black x="14" y="6" eval="good" />
+                                <moves>
+                                  <white x="16" y="6" eval="good" />
+                                </moves>
+                                <moves>
+                                  <white x="12" y="3" eval="bad" />
+                                  <moves>
+                                    <black x="11" y="3" eval="good" />
+                                    <moves>
+                                      <white x="12" y="5" eval="good" />
+                                      <moves>
+                                        <black x="11" y="4" eval="good" />
+                                        <moves>
+                                          <white x="12" y="4" eval="good" />
+                                          <moves>
+                                            <black x="12" y="7" eval="good" />
+                                          </moves>
+                                        </moves>
+                                      </moves>
+                                    </moves>
+                                  </moves>
+                                </moves>
+                              </moves>
+                              <moves>
+                                <black x="15" y="6" eval="good" />
+                              </moves>
+                              <moves>
+                                <black x="16" y="4" eval="bad" />
+                                <moves>
+                                  <white x="17" y="4" eval="good" />
+                                  <moves>
+                                    <black x="15" y="5" eval="good" />
+                                    <moves>
+                                      <white x="16" y="6" eval="good" />
+                                    </moves>
+                                  </moves>
+                                </moves>
+                              </moves>
+                            </moves>
+                          </moves>
+                        </moves>
+                      </moves>
+                    </moves>
+                  </moves>
+                  <moves>
+                    <black x="16" y="1" eval="good" />
+                    <moves>
+                      <white x="17" y="1" eval="good" />
+                      <moves>
+                        <black x="15" y="1" eval="good" />
+                        <moves>
+                          <white x="16" y="4" eval="good" />
+                          <moves>
+                            <black x="13" y="3" eval="good" />
+                            <moves>
+                              <white x="16" y="7" eval="good" />
+                            </moves>
+                          </moves>
+                        </moves>
+                        <moves>
+                          <white x="16" y="5" eval="good" />
+                          <moves>
+                            <black x="15" y="4" eval="good" />
+                            <moves>
+                              <white x="17" y="6" eval="good" />
+                              <moves>
+                                <black x="12" y="3" eval="good" />
+                              </moves>
+                            </moves>
+                            <moves>
+                              <white x="15" y="5" eval="good" />
+                              <moves>
+                                <black x="14" y="5" eval="good" />
+                                <moves>
+                                  <white x="14" y="6" eval="good" />
+                                  <moves>
+                                    <black x="13" y="5" eval="good" />
+                                    <moves>
+                                      <white x="13" y="6" eval="good" />
+                                      <moves>
+                                        <black x="12" y="5" eval="good" />
+                                        <moves>
+                                          <white x="12" y="6" eval="good" />
+                                          <moves>
+                                            <black x="11" y="5" eval="good" />
+                                            <moves>
+                                              <white x="16" y="4" eval="good" />
+                                              <moves>
+                                                <black x="11" y="6" eval="good" />
+                                              </moves>
+                                            </moves>
+                                          </moves>
+                                        </moves>
+                                      </moves>
+                                    </moves>
+                                  </moves>
+                                  <moves>
+                                    <black x="13" y="6" eval="good" />
+                                    <moves>
+                                      <white x="13" y="5" eval="good" />
+                                      <moves>
+                                        <black x="14" y="4" eval="good" />
+                                        <moves>
+                                          <white x="14" y="7" eval="good" />
+                                          <moves>
+                                            <black x="16" y="4" eval="good" />
+                                            <moves>
+                                              <white x="17" y="4" eval="good" />
+                                              <moves>
+                                                <black x="13" y="7" eval="good" />
+                                                <moves>
+                                                  <white x="14" y="8" eval="good" />
+                                                  <moves>
+                                                    <black x="13" y="8" eval="good" />
+                                                    <moves>
+                                                      <white x="14" y="9" eval="good" />
+                                                      <moves>
+                                                        <black x="12" y="5" eval="good" />
+                                                      </moves>
+                                                    </moves>
+                                                  </moves>
+                                                </moves>
+                                                <moves>
+                                                  <white x="13" y="8" eval="bad" />
+                                                  <moves>
+                                                    <black x="14" y="8" eval="good" />
+                                                    <moves>
+                                                      <white x="17" y="6" eval="good" />
+                                                      <moves>
+                                                        <black x="12" y="5" eval="good" />
+                                                      </moves>
+                                                    </moves>
+                                                  </moves>
+                                                </moves>
+                                              </moves>
+                                            </moves>
+                                          </moves>
+                                        </moves>
+                                      </moves>
+                                    </moves>
+                                  </moves>
+                                </moves>
+                              </moves>
+                              <moves>
+                                <black x="16" y="4" eval="good" />
+                                <moves>
+                                  <white x="17" y="4" eval="good" />
+                                  <moves>
+                                    <black x="17" y="5" eval="good" />
+                                    <moves>
+                                      <white x="17" y="6" eval="good" />
+                                      <moves>
+                                        <black x="17" y="3" eval="good" />
+                                        <moves>
+                                          <white x="18" y="5" eval="good" />
+                                          <moves>
+                                            <black x="17" y="2" eval="good" />
+                                          </moves>
+                                        </moves>
+                                      </moves>
+                                    </moves>
+                                    <moves>
+                                      <white x="18" y="3" eval="good" />
+                                      <moves>
+                                        <black x="14" y="5" eval="good" />
+                                        <moves>
+                                          <white x="14" y="6" eval="good" />
+                                          <moves>
+                                            <black x="13" y="5" eval="good" />
+                                            <moves>
+                                              <white x="15" y="7" eval="good" />
+                                              <moves>
+                                                <black x="13" y="6" eval="good" />
+                                              </moves>
+                                            </moves>
+                                          </moves>
+                                        </moves>
+                                      </moves>
+                                    </moves>
+                                    <moves>
+                                      <white x="17" y="3" eval="bad" />
+                                      <moves>
+                                        <black x="17" y="6" eval="good" />
+                                        <moves>
+                                          <white x="16" y="7" eval="good" />
+                                          <moves>
+                                            <black x="17" y="7" eval="good" />
+                                            <moves>
+                                              <white x="16" y="8" eval="good" />
+                                              <moves>
+                                                <black x="18" y="2" eval="good" />
+                                                <moves>
+                                                  <white x="18" y="1" eval="good" />
+                                                  <moves>
+                                                    <black x="18" y="5" eval="good" />
+                                                  </moves>
+                                                </moves>
+                                              </moves>
+                                            </moves>
+                                          </moves>
+                                        </moves>
+                                      </moves>
+                                    </moves>
+                                  </moves>
+                                </moves>
+                              </moves>
+                            </moves>
+                          </moves>
+                        </moves>
+                      </moves>
+                    </moves>
+                  </moves>
+                  <moves>
+                    <black x="16" y="4" eval="bad" />
+                    <moves>
+                      <white x="15" y="1" eval="good" />
+                      <moves>
+                        <black x="14" y="1" eval="good" />
+                        <moves>
+                          <white x="16" y="1" eval="good" />
+                          <moves>
+                            <black x="14" y="2" eval="good" />
+                            <moves>
+                              <white x="16" y="5" eval="good" />
+                              <moves>
+                                <black x="15" y="4" eval="good" />
+                                <moves>
+                                  <white x="17" y="4" eval="good" />
+                                </moves>
+                              </moves>
+                              <moves>
+                                <black x="17" y="4" eval="bad" />
+                                <moves>
+                                  <white x="15" y="4" eval="good" />
+                                  <moves>
+                                    <black x="17" y="5" eval="good" />
+                                    <moves>
+                                      <white x="15" y="5" eval="good" />
+                                      <moves>
+                                        <black x="16" y="6" eval="good" />
+                                        <moves>
+                                          <white x="15" y="6" eval="good" />
+                                          <moves>
+                                            <black x="16" y="7" eval="good" />
+                                            <moves>
+                                              <white x="13" y="1" eval="good" />
+                                              <moves>
+                                                <black x="13" y="3" eval="good" />
+                                                <moves>
+                                                  <white x="14" y="0" eval="good" />
+                                                  <moves>
+                                                    <black x="14" y="3" eval="good" />
+                                                    <moves>
+                                                      <white x="12" y="3" eval="good" />
+                                                      <moves>
+                                                        <black x="13" y="4" eval="good" />
+                                                        <moves>
+                                                          <white x="13" y="6" eval="good" />
+                                                          <moves>
+                                                            <black x="12" y="4" eval="good" />
+                                                            <moves>
+                                                              <white x="11" y="3" eval="good" />
+                                                              <moves>
+                                                                <black x="12" y="2" eval="good" />
+                                                                <moves>
+                                                                  <white x="11" y="5" eval="good" />
+                                                                  <moves>
+                                                                    <black x="11" y="4" eval="good" />
+                                                                    <moves>
+                                                                      <white x="10" y="3" eval="good" />
+                                                                      <moves>
+                                                                        <black x="10" y="4" eval="good" />
+                                                                        <moves>
+                                                                          <white x="10" y="2" eval="good" />
+                                                                        </moves>
+                                                                      </moves>
+                                                                    </moves>
+                                                                  </moves>
+                                                                  <moves>
+                                                                    <black x="17" y="3" eval="good" />
+                                                                    <moves>
+                                                                      <white x="10" y="2" eval="good" />
+                                                                      <moves>
+                                                                        <black x="12" y="1" eval="good" />
+                                                                        <moves>
+                                                                          <white x="13" y="0" eval="good" />
+                                                                          <moves>
+                                                                            <black x="10" y="1" eval="good" />
+                                                                            <moves>
+                                                                              <white x="12" y="0" eval="good" />
+                                                                              <moves>
+                                                                                <black x="11" y="1" eval="good" />
+                                                                                <moves>
+                                                                                  <white x="9" y="1" eval="good" />
+                                                                                  <moves>
+                                                                                    <black x="10" y="3" eval="good" />
+                                                                                    <moves>
+                                                                                      <white x="11" y="4" eval="good" />
+                                                                                      <moves>
+                                                                                        <black x="9" y="2" eval="good" />
+                                                                                        <moves>
+                                                                                          <white x="12" y="5" eval="good" />
+                                                                                        </moves>
+                                                                                      </moves>
+                                                                                    </moves>
+                                                                                  </moves>
+                                                                                </moves>
+                                                                              </moves>
+                                                                            </moves>
+                                                                          </moves>
+                                                                        </moves>
+                                                                      </moves>
+                                                                    </moves>
+                                                                  </moves>
+                                                                </moves>
+                                                              </moves>
+                                                            </moves>
+                                                          </moves>
+                                                        </moves>
+                                                      </moves>
+                                                    </moves>
+                                                  </moves>
+                                                </moves>
+                                              </moves>
+                                            </moves>
+                                          </moves>
+                                          <moves>
+                                            <black x="15" y="7" eval="bad" />
+                                            <moves>
+                                              <white x="13" y="5" eval="good" />
+                                              <moves>
+                                                <black x="13" y="1" eval="good" />
+                                                <moves>
+                                                  <white x="16" y="7" eval="good" />
+                                                  <moves>
+                                                    <black x="17" y="6" eval="good" />
+                                                    <moves>
+                                                      <white x="17" y="7" eval="good" />
+                                                    </moves>
+                                                  </moves>
+                                                </moves>
+                                              </moves>
+                                            </moves>
+                                          </moves>
+                                        </moves>
+                                      </moves>
+                                    </moves>
+                                  </moves>
+                                </moves>
+                              </moves>
+                            </moves>
+                          </moves>
+                        </moves>
+                      </moves>
+                    </moves>
+                    <moves>
+                      <white x="16" y="1" eval="trick" />
+                      <moves>
+                        <black x="15" y="4" eval="good" />
+                        <moves>
+                          <white x="15" y="1" eval="good" />
+                          <moves>
+                            <black x="14" y="2" eval="good" />
+                            <moves>
+                              <white x="14" y="1" eval="good" />
+                              <moves>
+                                <black x="13" y="3" eval="good" />
+                              </moves>
+                            </moves>
+                          </moves>
+                        </moves>
+                      </moves>
+                      <moves>
+                        <black x="15" y="1" eval="bad" />
+                        <moves>
+                          <white x="15" y="4" eval="good" />
+                          <moves>
+                            <black x="16" y="5" eval="good" />
+                            <moves>
+                              <white x="14" y="3" eval="good" />
+                              <moves>
+                                <black x="14" y="4" eval="good" />
+                                <moves>
+                                  <white x="15" y="5" eval="good" />
+                                  <moves>
+                                    <black x="15" y="6" eval="good" />
+                                    <moves>
+                                      <white x="14" y="5" eval="good" />
+                                      <moves>
+                                        <black x="13" y="4" eval="good" />
+                                        <moves>
+                                          <white x="13" y="5" eval="good" />
+                                          <moves>
+                                            <black x="14" y="2" eval="good" />
+                                            <moves>
+                                              <white x="12" y="2" eval="good" />
+                                              <moves>
+                                                <black x="13" y="1" eval="good" />
+                                                <moves>
+                                                  <white x="12" y="1" eval="good" />
+                                                </moves>
+                                              </moves>
+                                            </moves>
+                                          </moves>
+                                        </moves>
+                                      </moves>
+                                    </moves>
+                                  </moves>
+                                </moves>
+                              </moves>
+                            </moves>
+                          </moves>
+                        </moves>
+                      </moves>
+                    </moves>
+                  </moves>
+                </moves>
+                <moves>
+                  <white x="15" y="1" eval="bad" />
+                  <moves>
+                    <black x="16" y="3" eval="good" />
+                    <moves>
+                      <white x="17" y="1" eval="good" />
+                      <moves>
+                        <black x="17" y="2" eval="good" />
+                        <moves>
+                          <white x="16" y="1" eval="good" />
+                          <moves>
+                            <black x="13" y="3" eval="good" />
+                            <moves>
+                              <white x="14" y="2" eval="good" />
+                              <moves>
+                                <black x="14" y="3" eval="good" />
+                              </moves>
+                            </moves>
+                          </moves>
+                        </moves>
+                      </moves>
+                    </moves>
+                  </moves>
+                </moves>
+              </moves>
+              <moves>
+                <mark x="15" y="9" symbol="a" />
+                <black x="16" y="3" eval="bad" comment="但如果在a位附近有黑子则是好棋。" />
+                <moves>
+                  <white x="15" y="2" eval="good" />
+                  <moves>
+                    <black x="14" y="3" eval="good" />
+                    <moves>
+                      <white x="13" y="1" eval="good" />
+                      <moves>
+                        <black x="12" y="4" eval="good" />
+                        <moves>
+                          <white x="16" y="9" eval="good" />
+                        </moves>
+                        <moves>
+                          <white x="15" y="9" eval="good" />
+                        </moves>
+                      </moves>
+                    </moves>
+                    <moves>
+                      <white x="13" y="3" eval="good" />
+                      <moves>
+                        <black x="14" y="2" eval="good" />
+                        <moves>
+                          <white x="14" y="1" eval="good" />
+                          <moves>
+                            <black x="15" y="1" eval="good" />
+                            <moves>
+                              <white x="16" y="1" eval="good" />
+                              <moves>
+                                <black x="13" y="1" eval="good" />
+                                <moves>
+                                  <white x="15" y="0" eval="good" />
+                                  <moves>
+                                    <black x="12" y="1" eval="good" />
+                                    <moves>
+                                      <white x="13" y="4" eval="good" />
+                                      <moves>
+                                        <black x="17" y="3" eval="good" />
+                                        <moves>
+                                          <white x="17" y="2" eval="good" />
+                                          <moves>
+                                            <black x="15" y="6" eval="good" />
+                                          </moves>
+                                        </moves>
+                                      </moves>
+                                    </moves>
+                                  </moves>
+                                  <moves>
+                                    <black x="13" y="4" eval="good" />
+                                    <moves>
+                                      <white x="12" y="1" eval="good" />
+                                      <moves>
+                                        <black x="12" y="3" eval="good" />
+                                        <moves>
+                                          <white x="13" y="0" eval="good" />
+                                          <moves>
+                                            <black x="12" y="2" eval="good" />
+                                            <moves>
+                                              <white x="13" y="1" eval="good" />
+                                              <moves>
+                                                <black x="12" y="5" eval="good" />
+                                              </moves>
+                                            </moves>
+                                          </moves>
+                                          <moves>
+                                            <black x="12" y="5" eval="good" />
+                                          </moves>
+                                        </moves>
+                                      </moves>
+                                    </moves>
+                                  </moves>
+                                </moves>
+                              </moves>
+                            </moves>
+                          </moves>
+                        </moves>
+                      </moves>
+                    </moves>
+                  </moves>
+                </moves>
+              </moves>
+            </moves>
+          </moves>
+        </moves>
+      </moves>
+      <moves>
+        <pre title="小目定式">
+          <black x="16" y="3" />
+        </pre>
+        <moves>
+          <white x="14" y="2" eval="good" />
+          <moves>
+            <black x="11" y="3" eval="good" />
+            <moves>
+              <white x="13" y="3" eval="good" />
+              <moves>
+                <black x="15" y="5" eval="good" />
+                <moves>
+                  <white x="16" y="1" eval="good" />
+                  <moves>
+                    <black x="16" y="9" eval="good" />
+                  </moves>
+                </moves>
+              </moves>
+            </moves>
+          </moves>
+          <moves>
+            <black x="15" y="4" eval="good" />
+            <moves>
+              <white x="12" y="3" eval="good" />
+              <moves>
+                <black x="16" y="9" eval="good" />
+                <moves>
+                  <white x="8" y="2" eval="good" />
+                </moves>
+              </moves>
+            </moves>
+          </moves>
+          <moves>
+            <black x="15" y="5" eval="good" />
+            <moves>
+              <white x="16" y="2" eval="good" />
+              <moves>
+                <black x="17" y="2" eval="good" />
+                <moves>
+                  <white x="15" y="3" eval="good" />
+                  <moves>
+                    <black x="16" y="4" eval="good" />
+                    <moves>
+                      <white x="16" y="1" eval="good" />
+                      <moves>
+                        <black x="16" y="9" eval="good" />
+                      </moves>
+                    </moves>
+                  </moves>
+                </moves>
+              </moves>
+            </moves>
+          </moves>
+        </moves>
+        <moves>
+          <white x="14" y="3" eval="good" />
+          <moves>
+            <black x="14" y="2" eval="good" />
+            <moves>
+              <white x="13" y="2" eval="good" />
+              <moves>
+                <black x="15" y="2" eval="good" />
+                <moves>
+                  <white x="12" y="3" eval="good" />
+                  <moves>
+                    <black x="16" y="5" eval="good" />
+                    <moves>
+                      <white x="8" y="2" eval="good" />
+                    </moves>
+                  </moves>
+                </moves>
+              </moves>
+            </moves>
+            <moves>
+              <white x="15" y="3" eval="good" />
+              <moves>
+                <black x="15" y="2" eval="good" />
+                <moves>
+                  <white x="16" y="4" eval="good" />
+                  <moves>
+                    <black x="16" y="2" eval="good" />
+                    <moves>
+                      <white x="13" y="3" eval="good" />
+                      <moves>
+                        <black x="12" y="2" eval="good" />
+                        <moves>
+                          <white x="15" y="5" eval="good" />
+                        </moves>
+                      </moves>
+                    </moves>
+                  </moves>
+                  <moves>
+                    <black x="13" y="3" eval="good" comment="小雪崩" />
+                  </moves>
+                  <moves>
+                    <black x="13" y="2" eval="good" />
+                    <moves>
+                      <white x="13" y="3" eval="good" />
+                      <moves>
+                        <black x="12" y="3" eval="good" comment="大雪崩" />
+                      </moves>
+                    </moves>
+                  </moves>
+                  <moves>
+                    <black x="17" y="4" eval="good" />
+                  </moves>
+                </moves>
+              </moves>
+            </moves>
+          </moves>
+        </moves>
+      </moves>
+    </moves>
+  </moves>
+</wei7>

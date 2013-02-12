@@ -71,21 +71,20 @@ refreshForResize = ->
 applyHomePage = ->
     setScene("home")
     ui.board.addWelcomeStones()
-    ui.board.addSquareButton("网", new Point(-320, 224), -> ui.board.init(19, ->
-        setScene("net")
-        ui.board.addButton("返回", new Point(0, 0), -> ui.board.init(19, applyHomePage))
-        ui.board.showDialog()
-    ))
+    ui.board.addSquareButton("网", new Point(-320, 224), -> setScene("net"))
     ui.board.addSquareButton("闲", new Point(-160, 224), -> ui.board.init(19, -> setScene("free")))
     ui.board.addSquareButton("闯", new Point(0, 224), -> ui.board.init(19, -> setScene("rush")))
-    ui.board.addSquareButton("学", new Point(160, 224), undefined)
-    ui.board.addSquareButton("谱", new Point(320, 224), undefined)
-    settingsButton = ui.board.addSquareButton("≡", new Point(-50, 364), undefined)
+    ui.board.addSquareButton("学", new Point(160, 224), -> setScene("learn"))
+    ui.board.addSquareButton("谱", new Point(320, 224), -> setScene("records"))
+    settingsButton = ui.board.addSquareButton("≡", new Point(-50, 364), ->
+        alert("不好意思，选项对话框的开发工作尚未完成。")
+    )
     setElementScale(settingsButton, 0.5)
     helpButton = ui.board.addSquareButton("?", new Point(50, 364), -> window.open("wei7help.pdf"))
     setElementScale(helpButton, 0.5)
     context.game = null
     ui.board.showDialog(0)
+GoHome = -> ui.board.init(19, applyHomePage)
 document.addEventListener("DOMContentLoaded", ->
     svgPoint = (x, y) ->
         p = ui.root.createSVGPoint()

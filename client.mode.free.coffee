@@ -5,7 +5,7 @@ sceneMaker["free"] = ->
         resultText =
             GameHelper.getResultText(result)
         ui.board.addLabel(resultText, new Point(0, -160), 96)
-        ui.board.addButton("确定", new Point(0, 160), -> ui.board.init(19, applyHomePage))
+        ui.board.addButton("确定", new Point(0, 160), GoHome)
         ui.board.showDialog()
     addGameButtons = ->
         ui.board.addButton("返回", new Point(0, -160), -> ui.board.hideDialog())
