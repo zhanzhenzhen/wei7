@@ -1,4 +1,6 @@
 context =
+    localSettings: null
+    cloudSettings: null
     scene: null
     game: null
     postMoveHook: null
@@ -6,6 +8,28 @@ ui = {}
 sceneMaker = {}
 windowWidth = 0
 windowHeight = 0
+saveLocalSettings = -> localStorage.settings = JSON.stringify(context.localSettings)
+loadLocalSettings = ->
+    newestSchema = "2013-02-18"
+    a = localStorage.settings
+    b =
+        if localStorage.metaSchema == newestSchema and a?
+            # 如用户不慎修改了该JSON字符串，那可能会无法解析，如不容错，那网站就永远无法正常工作
+            # （除非清除浏览器的历史记录）。所以必须容错，再加上自动纠正机制。
+            try
+                JSON.parse(a)
+            catch e
+                {}
+        else
+            localStorage.metaSchema = newestSchema
+            {}
+    # 对于每项设置，设定它的默认值（如果需要）
+    do ->
+        b.correction ?= false
+    context.localSettings = b
+do ->
+    loadLocalSettings()
+    saveLocalSettings() # 如果本地没有这个设置，但网站已经有这个设置的话，就需要保存它的默认值
 class BoardPointLabels
     constructor: (@boardSize) ->
         @points = (null for i in [0...size * size])
@@ -126,20 +150,28 @@ document.addEventListener("DOMContentLoaded", ->
             if context.game != null
                 ui.board.showDialog()
         )
+        pendingMoveTimeoutID = null
         setElementClickHandler(ui.boardInput, (event) ->
-            aaa = ui.root.convertPointFromClient(new Point(event.clientX, event.clientY))
             if context.game != null and not ui.board.isBlocked and not ui.board.isInDialog
                 point = ui.board.mapPointFromUI(
                     ui.root.convertPointFromClient(new Point(event.clientX, event.clientY))
                 )
                 if 0 <= point.x < ui.board.size and 0 <= point.y < ui.board.size
-                    GameHelper.playMoveInBoard(point)
+                    if context.localSettings.correction
+                        setElementTranslate(ui.boardPendingMove, ui.board.mapPointToUI(point))
+                        showElement(ui.boardPendingMove)
+                        window.clearTimeout(pendingMoveTimeoutID) if pendingMoveTimeoutID?
+                        pendingMoveTimeoutID = window.setTimeout(->
+                            hideElement(ui.boardPendingMove)
+                            GameHelper.playMoveInBoard(point)
+                            pendingMoveTimeoutID = null
+                        , 1000)
+                    else
+                        GameHelper.playMoveInBoard(point)
         )
     window.addEventListener("resize", refreshForResize)
     ui.root.appendChild(ui.outsideInput)
     refreshForResize()
-    ui.root.appendChild(ui.blackStoneGradient)
-    ui.root.appendChild(ui.whiteStoneGradient)
     ui.root.appendChild(ui.blackStone)
     ui.root.appendChild(ui.whiteStone)
     ui.board.make(19)

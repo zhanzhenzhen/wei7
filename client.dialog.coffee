@@ -20,8 +20,9 @@ ui.board.addButton = (text, position, clickHandler) ->
             <text x="0" y="20" fill="rgb(255,255,255)" font-size="56" text-anchor="middle" />
         </g>
     """)
-    element.getElementsByTagName("rect")[0].backgroundChecked = "rgb(255,48,48)"
-    element.getElementsByTagName("rect")[0].backgroundUnchecked = "rgb(0,128,255)"
+    element.backgroundChecked = "rgb(255,48,48)"
+    element.backgroundUnchecked = "rgb(0,128,255)"
+    element.isChecked = false
     element.getElementsByTagName("text")[0].textContent = text
     setElementClickHandler(element, clickHandler) if clickHandler?
     ui.boardDialog.appendChild(element)
@@ -42,7 +43,9 @@ ui.board.addLabel = (text, position, fontSize) ->
     element
 ui.board.setButtonChecked = (button) ->
     rect = button.getElementsByTagName("rect")[0]
-    rect.setAttribute("fill", rect.backgroundChecked)
+    rect.setAttribute("fill", button.backgroundChecked)
+    button.isChecked = true
 ui.board.setButtonUnchecked = (button) ->
     rect = button.getElementsByTagName("rect")[0]
-    rect.setAttribute("fill", rect.backgroundUnchecked)
+    rect.setAttribute("fill", button.backgroundUnchecked)
+    button.isChecked = false

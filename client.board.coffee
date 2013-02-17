@@ -35,6 +35,7 @@ ui.board.make = (size) ->
     emptyElement(ui.info2)
     ui.board.hideDialog()
     hideElement(ui.boardActiveStoneReminder)
+    hideElement(ui.boardPendingMove)
     ui.board.isBlocked = true
     ui.board.size = size
     ui.board.unitLength = calcUnitLength(19)
