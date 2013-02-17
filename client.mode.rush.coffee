@@ -50,7 +50,7 @@ sceneMaker["rush"] = ->
         info2Table = parseElement("""
             <table style="width: 100%; height: 100%;"
                     xmlns="http://www.w3.org/1999/xhtml">
-                <tr><td style="padding: 6.25%;"></td></tr>
+                <tr><td style="padding: 0 6.25%;"></td></tr>
             </table>
         """)
         hintLabel = info2Table.getElementsByTagName("td")[0]

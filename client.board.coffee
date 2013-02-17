@@ -135,8 +135,8 @@ ui.board.setActiveStone = (gamePoint) ->
         p = ui.board.mapPointToUI(gamePoint)
         scale = 1
     if isElementVisible(reminder)
-        translateAnimate(reminder, undefined, p, syncTime, 200, 600, linearTimingFunction)
-        scaleAnimate(reminder, undefined, scale, syncTime, 200, 600, linearTimingFunction)
+        translateAnimate(reminder, undefined, p, syncTime, 200, 600, easeTimingFunction)
+        scaleAnimate(reminder, undefined, scale, syncTime, 200, 600, easeTimingFunction)
     else
         setElementTranslate(reminder, p)
         setElementScale(reminder, 0.000001)

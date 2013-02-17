@@ -102,7 +102,7 @@ setElementClickHandler = (element, handler, threshold) ->
         )
     else
         element.addEventListener("mousedown", (event) ->
-            if isInputInElement(element, event)
+            if event.button == 0 and isInputInElement(element, event)
                 startTime = window.performance.now()
             else
                 startTime = null
@@ -112,7 +112,7 @@ setElementClickHandler = (element, handler, threshold) ->
                 startTime = null
         )
         element.addEventListener("mouseup", (event) ->
-            if startTime? and isInputInElement(element, event) and
+            if startTime? and event.button == 0 and isInputInElement(element, event) and
                     window.performance.now() - startTime < threshold
                 handler(event)
             startTime = null
@@ -127,11 +127,9 @@ setElementHoldHandler = (element, handler, threshold) ->
         timeoutID = null
     if isTouchDevice
         element.addEventListener("touchstart", (event) ->
+            clearDelay()
             if event.touches.length == 1 and isInputInElement(element, event.changedTouches[0])
-                clearDelay()
                 setDelay()
-            else
-                clearDelay()
         )
         element.addEventListener("touchmove", (event) ->
             if not (event.touches.length == 1 and isInputInElement(element, event.changedTouches[0]))
@@ -142,11 +140,9 @@ setElementHoldHandler = (element, handler, threshold) ->
         )
     else
         element.addEventListener("mousedown", (event) ->
-            if isInputInElement(element, event)
-                clearDelay()
+            clearDelay()
+            if event.button == 0 and isInputInElement(element, event)
                 setDelay()
-            else
-                clearDelay()
         )
         element.addEventListener("mousemove", (event) ->
             if not isInputInElement(element, event)

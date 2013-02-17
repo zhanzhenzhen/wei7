@@ -20,9 +20,15 @@ ui.board.addButton = (text, position, clickHandler) ->
             <text x="0" y="20" fill="rgb(255,255,255)" font-size="56" text-anchor="middle" />
         </g>
     """)
+    element.getElementsByTagName("rect")[0].backgroundChecked = "rgb(255,48,48)"
+    element.getElementsByTagName("rect")[0].backgroundUnchecked = "rgb(0,128,255)"
     element.getElementsByTagName("text")[0].textContent = text
     setElementClickHandler(element, clickHandler) if clickHandler?
     ui.boardDialog.appendChild(element)
+    element
+ui.board.addSmallButton = (text, position, clickHandler) ->
+    element = ui.board.addButton(text, position, clickHandler)
+    setElementScale(element, 0.75)
     element
 ui.board.addLabel = (text, position, fontSize) ->
     fontSize ?= 56
@@ -34,3 +40,9 @@ ui.board.addLabel = (text, position, fontSize) ->
     element.textContent = text
     ui.boardDialog.appendChild(element)
     element
+ui.board.setButtonChecked = (button) ->
+    rect = button.getElementsByTagName("rect")[0]
+    rect.setAttribute("fill", rect.backgroundChecked)
+ui.board.setButtonUnchecked = (button) ->
+    rect = button.getElementsByTagName("rect")[0]
+    rect.setAttribute("fill", rect.backgroundUnchecked)
