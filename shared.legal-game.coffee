@@ -7,7 +7,7 @@ class LegalGame extends Game
         move = {color: @getNextColor(), position: position}
         lastMove = @getLastMove()
         lastButOneMove = if @moves.length < 2 then null else @moves[@moves.length - 2]
-        super(move)
+        @barePlayMove(move)
         # 禁止打劫时立即反吃
         do =>
             if lastMove != null and lastMove.captures.length == 1 == move.captures.length
@@ -45,18 +45,23 @@ class LegalGame extends Game
                     ) and p32.equal(p21)
                         @undo()
                         fail("Illegal move.")
-        if lastMove != null and lastMove.position == null and move.position == null
-            @_isEnded = true
+        @triggerEvent("AfterPlayMove")
+        if lastMove != null and lastButOneMove != null and
+                lastMove.position == null and lastButOneMove.position == null and move.position == null
+            @end()
     setResult: (winner, margin) ->
         if @_result != undefined then fail("Game result already set.")
-        @_isEnded = true
         @_result = {winner: winner, margin: margin}
+        @end()
     getResult: ->
         if @_result == undefined
             undefined
         else
             {winner: @_result.winner, margin: @_result.margin}
-    end: -> @_isEnded = true
+    end: ->
+        if not @_isEnded
+            @_isEnded = true
+            @triggerEvent("Ended")
     isEnded: -> @_isEnded
     resign: -> @setResult(Game.getOpposite(@getNextColor()), null)
     calculateScore: ->

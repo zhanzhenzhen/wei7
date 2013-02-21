@@ -124,7 +124,7 @@ ui.board.removeStone = (gamePoint, useAnimation) ->
         )
     else
         ui.boardStones.removeChild(element)
-ui.board.setActiveStone = (gamePoint) ->
+ui.board.setActiveStone = (gamePoint, color) ->
     syncTime = window.performance.now()
     reminder = ui.boardActiveStoneReminder
     if gamePoint == null
@@ -132,15 +132,19 @@ ui.board.setActiveStone = (gamePoint) ->
         p = new Point(0, 0)
         box = reminder.getBBox()
         scale = 1024 / ((box.width + box.height) / 2) * factor
+        rotate = if color == Game.COLOR_BLACK then 0 else 45
     else
         p = ui.board.mapPointToUI(gamePoint)
         scale = 1
+        rotate = 0
     if isElementVisible(reminder)
         translateAnimate(reminder, undefined, p, syncTime, 200, 600, easeTimingFunction)
         scaleAnimate(reminder, undefined, scale, syncTime, 200, 600, easeTimingFunction)
+        rotateAnimate(reminder, undefined, rotate, syncTime, 200, 600, easeTimingFunction)
     else
         setElementTranslate(reminder, p)
         setElementScale(reminder, 0.000001)
+        setElementRotate(reminder, 0)
         showElement(reminder)
         scaleAnimate(reminder, undefined, scale, syncTime, 200, 600, popTimingFunction)
 ui.board.updateStones = (diff, useAnimation) ->

@@ -21,11 +21,12 @@ liberty指气，指具体的某一口气，它是一个position。
 其次是对一些词语的解释：
 adjacent或相邻，仅包括水平和竖直方向，不包括对角线方向。
 ###
-class Game
+class Game extends ObjectWithEvent
     @COLOR_EMPTY: 0
     @COLOR_BLACK: 1
     @COLOR_WHITE: 2
     constructor: (@size, @firstColor) ->
+        super()
         @secondColor = Game.getOpposite(firstColor)
         @moves = []
         @_board = @_createBoard()
@@ -99,7 +100,7 @@ class Game
         if @moves.length != 0 then fail("Already has moves.")
         @_board = @_createBoard()
         @_chains = []
-    playMove: (move) ->
+    barePlayMove: (move) ->
         move.previousState = @_cloneState()
         move.captures = []
         pos = move.position # pos如为null则代表pass
@@ -138,6 +139,9 @@ class Game
             if !hasCaptures and chainForMove != null and chainForMove.getLiberties().length == 0
                 @undo()
                 fail("Illegal move.")
+    playMove: (move) ->
+        @barePlayMove(move)
+        @triggerEvent("AfterPlayMove")
     undo: ->
         move = @moves[@moves.length - 1]
         @_board = move.previousState.board

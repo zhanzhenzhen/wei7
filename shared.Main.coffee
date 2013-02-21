@@ -3,6 +3,18 @@ fail = (errorMessage) -> throw new Error(errorMessage)
 randomInt = (n) -> Math.floor(Math.random() * n)
 randomItemInArray = (array) -> array[randomInt(array.length)]
 jsonClone = (x) -> JSON.parse(JSON.stringify(x))
+class ObjectWithEvent
+    constructor: ->
+        @_eventList = {} # 用对象来模拟dictionary比用数组方便，但事件不能取会产生冲突的名称
+    subscribeEvent: (eventName, handler) ->
+        @_eventList[eventName] ?= []
+        @_eventList[eventName].push(handler) if @_eventList[eventName].indexOf(handler) == -1
+    unsubscribeEvent: (eventName, handler) ->
+        index = indexOf(handler)
+        @_eventList[eventName].splice(index, 1) if index != -1
+    triggerEvent: (eventName, arg) ->
+        @_eventList[eventName] ?= []
+        m(arg) for m in @_eventList[eventName]
 # 这个类既可表示一个“点”，也可表示一个“向量”，因本质上都是两个数字（有序对）
 class Point
     constructor: (@x, @y) ->

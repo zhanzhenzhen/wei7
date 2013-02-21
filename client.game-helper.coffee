@@ -39,5 +39,4 @@ class GameHelper
         newSnapshot = game.getBoardSnapshot()
         diff = Game.compareSnapshots(oldSnapshot, newSnapshot)
         ui.board.updateStones(diff, true)
-        ui.board.setActiveStone(point)
-        context.postMoveHook?()
+        ui.board.setActiveStone(point, game.getLastMove().color)

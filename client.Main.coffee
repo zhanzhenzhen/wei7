@@ -3,7 +3,6 @@ context =
     cloudSettings: null
     scene: null
     game: null
-    postMoveHook: null
 ui = {}
 sceneMaker = {}
 windowWidth = 0
@@ -48,7 +47,6 @@ codifyElement = (object, elementString) ->
 initUIElements()
 setScene = (mode) ->
     context.scene = {mode: mode, isEnded: false}
-    context.postMoveHook = null
     sceneMaker[mode]?()
 setDebugVariables = ->
     window.wei7debug = {}
@@ -97,7 +95,7 @@ applyHomePage = ->
     ui.board.addWelcomeStones()
     ui.board.addSquareButton("网", new Point(-320, 224), -> setScene("net"))
     ui.board.addSquareButton("闯", new Point(-160, 224), -> ui.board.init(19, -> setScene("rush")))
-    ui.board.addSquareButton("闲", new Point(0, 224), -> ui.board.init(19, -> setScene("free")))
+    ui.board.addSquareButton("自", new Point(0, 224), -> ui.board.init(19, -> setScene("free")))
     ui.board.addSquareButton("学", new Point(160, 224), -> setScene("learn"))
     ui.board.addSquareButton("谱", new Point(320, 224), -> setScene("records"))
     settingsButton = ui.board.addSquareButton("≡", new Point(-50, 364), ->
