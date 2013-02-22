@@ -2,12 +2,12 @@ class LegalGame extends Game
     constructor: (size, @komi) ->
         super(size, Game.COLOR_BLACK)
         @_isEnded = false
-    playMove: (position) ->
+    barePlayMove: (position) ->
         if @_isEnded then fail("Game already ended.")
         move = {color: @getNextColor(), position: position}
         lastMove = @getLastMove()
         lastButOneMove = if @moves.length < 2 then null else @moves[@moves.length - 2]
-        @barePlayMove(move)
+        super(move)
         # 禁止打劫时立即反吃
         do =>
             if lastMove != null and lastMove.captures.length == 1 == move.captures.length
@@ -45,10 +45,21 @@ class LegalGame extends Game
                     ) and p32.equal(p21)
                         @undo()
                         fail("Illegal move.")
+    playMove: (position) ->
+        lastMove = @getLastMove()
+        lastButOneMove = if @moves.length < 2 then null else @moves[@moves.length - 2]
+        @barePlayMove(position)
         @triggerEvent("AfterPlayMove")
         if lastMove != null and lastButOneMove != null and
-                lastMove.position == null and lastButOneMove.position == null and move.position == null
+                lastMove.position == null and lastButOneMove.position == null and position == null
             @end()
+    testMove: (position) ->
+        try
+            @barePlayMove(position)
+        catch e
+            return false
+        @undo()
+        true
     setResult: (winner, margin) ->
         if @_result != undefined then fail("Game result already set.")
         @_result = {winner: winner, margin: margin}

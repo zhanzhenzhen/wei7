@@ -142,6 +142,13 @@ class Game extends ObjectWithEvent
     playMove: (move) ->
         @barePlayMove(move)
         @triggerEvent("AfterPlayMove")
+    testMove: (move) ->
+        try
+            @barePlayMove(move)
+        catch e
+            return false
+        @undo()
+        true
     undo: ->
         move = @moves[@moves.length - 1]
         @_board = move.previousState.board

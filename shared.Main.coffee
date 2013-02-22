@@ -2,6 +2,11 @@ fail = (errorMessage) -> throw new Error(errorMessage)
 # 返回一个大于等于0且小于n的随机整数
 randomInt = (n) -> Math.floor(Math.random() * n)
 randomItemInArray = (array) -> array[randomInt(array.length)]
+takeOutRandomItemInArray = (array) ->
+    index = randomInt(array.length)
+    r = array[index]
+    array.splice(index, 1)
+    r
 jsonClone = (x) -> JSON.parse(JSON.stringify(x))
 class ObjectWithEvent
     constructor: ->

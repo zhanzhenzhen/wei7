@@ -18,18 +18,11 @@ class GameHelper
         score = legalGame.calculateScore()
         legalGame.setResult(score.winner, score.margin)
     @randomBot: (legalGame) ->
-        testMove = (p) ->
-            try
-                legalGame.playMove(p)
-            catch e
-                return false
-            legalGame.undo()
-            true
         emptyPoints = legalGame.getPointsInColor(Game.COLOR_EMPTY)
         success = do ->
-            for i in [0...20]
-                p = randomItemInArray(emptyPoints)
-                if testMove(p) then return p
+            while emptyPoints.length != 0
+                p = takeOutRandomItemInArray(emptyPoints)
+                if legalGame.testMove(p) then return p
             return null
         success
     @playMoveInBoard: (point) ->

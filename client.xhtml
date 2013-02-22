@@ -27,7 +27,7 @@
                 padding: 0;
             }
             body>* {
-                position: fixed;
+                position: absolute; /* 本来用fixed，但Chrome 17渲染有bug，且iOS中点击会有延迟 */
             }
         ]]></style>
         <script type="text/javascript" src="client.js" />

@@ -9,6 +9,10 @@ if window.performance == undefined
         now: -> Date.now() - window.performance.timing.navigationStart
         timing:
             navigationStart: Date.now()
+# Chrome 21（360浏览器使用的内核）不支持window.performance.now，
+# 360浏览器在中国有很大份额，所以也得考虑进去，使用低精度的模拟。
+if window.performance != undefined and window.performance.now == undefined
+    window.performance.now = -> Date.now() - window.performance.timing.navigationStart
 # Safari现在还在仅使用带前缀的window.requestAnimationFrame，
 # 而且还在使用已废弃的timestamp作为回调函数的参数，所以我们在Safari中模拟标准实现。
 # 注意：Chrome也是使用WebKit，但是已经支持不带前缀的了，所以此模拟只针对Safari。
