@@ -63,6 +63,9 @@ refreshForResize = ->
     if w != windowWidth or h != windowHeight
         windowWidth = w
         windowHeight = h
+        # 如果在html中设width和height为100%，则iOS中若改变orientation，尺寸会调整失败
+        ui.root.setAttribute("width", w.toString())
+        ui.root.setAttribute("height", h.toString())
         ui.root.positionLimit = ui.root.convertPointFromClient(new Point(w, h))
         ui.outsideInput.setAttribute("x", (-ui.root.positionLimit.x).toString())
         ui.outsideInput.setAttribute("y", (-ui.root.positionLimit.y).toString())
