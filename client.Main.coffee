@@ -67,10 +67,6 @@ refreshForResize = ->
         ui.root.setAttribute("width", w.toString())
         ui.root.setAttribute("height", h.toString())
         ui.root.positionLimit = ui.root.convertPointFromClient(new Point(w, h))
-        ui.outsideInput.setAttribute("x", (-ui.root.positionLimit.x).toString())
-        ui.outsideInput.setAttribute("y", (-ui.root.positionLimit.y).toString())
-        ui.outsideInput.setAttribute("width", (ui.root.positionLimit.x * 2).toString())
-        ui.outsideInput.setAttribute("height", (ui.root.positionLimit.y * 2).toString())
         do ->
             narrowFactor = (x) ->
                 n = if x > 1 then 1 / x else x
@@ -87,12 +83,6 @@ refreshForResize = ->
             ui.info2.style.top = "#{if w > h then 0 else h - p.y}px"
             ui.info2.style.width = "#{if w > h then p.x else w}px"
             ui.info2.style.height = "#{if w > h then h else p.y}px"
-            if w / h > 1.2 or w / h < 1 / 1.2
-                showElement(ui.info1)
-                showElement(ui.info2)
-            else
-                hideElement(ui.info1)
-                hideElement(ui.info2)
 applyHomePage = ->
     setScene("home")
     ui.board.addWelcomeStones()
@@ -136,17 +126,17 @@ document.addEventListener("DOMContentLoaded", ->
         new Point(p2.x, p2.y)
     # )*****
     do ->
-        ui.root.addEventListener("mousedown", preventDefaultEventHandler)
-        ui.root.addEventListener("mouseup", preventDefaultEventHandler)
-        ui.root.addEventListener("mousemove", preventDefaultEventHandler)
+        document.body.addEventListener("mousedown", preventDefaultEventHandler)
+        document.body.addEventListener("mouseup", preventDefaultEventHandler)
+        document.body.addEventListener("mousemove", preventDefaultEventHandler)
         if isTouchDevice
-            ui.root.addEventListener("touchstart", preventDefaultEventHandler)
-            ui.root.addEventListener("touchend", preventDefaultEventHandler)
-            ui.root.addEventListener("touchmove", preventDefaultEventHandler)
-        setElementClickHandler(ui.outsideInput, ->
+            document.body.addEventListener("touchstart", preventDefaultEventHandler)
+            document.body.addEventListener("touchend", preventDefaultEventHandler)
+            document.body.addEventListener("touchmove", preventDefaultEventHandler)
+        [ui.info1, ui.info2].forEach((m) -> setElementClickHandler(m, ->
             if context.game != null
                 ui.board.showDialog()
-        )
+        ))
         setElementHoldHandler(ui.boardInput, ->
             if context.game != null
                 ui.board.showDialog()
@@ -171,7 +161,6 @@ document.addEventListener("DOMContentLoaded", ->
                         GameHelper.playMoveInBoard(point)
         )
     window.addEventListener("resize", refreshForResize)
-    ui.root.appendChild(ui.outsideInput)
     refreshForResize()
     ui.root.appendChild(ui.blackStone)
     ui.root.appendChild(ui.whiteStone)

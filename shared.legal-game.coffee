@@ -8,9 +8,15 @@ class LegalGame extends Game
         lastMove = @getLastMove()
         lastButOneMove = if @moves.length < 2 then null else @moves[@moves.length - 2]
         super(move)
+        # 禁止只有一颗棋子的自杀
+        do =>
+            if move.captures.length == 1 and move.isSuicide
+                @undo()
+                fail("Illegal move. Single-stone suicide is forbidden.")
         # 禁止打劫时立即反吃
         do =>
-            if lastMove != null and lastMove.captures.length == 1 == move.captures.length
+            if lastMove != null and lastMove.captures.length == 1 == move.captures.length and
+                    not lastMove.isSuicide and not move.isSuicide
                 p11 = lastMove.position
                 p12 = lastMove.captures[0]
                 p21 = move.position
@@ -20,13 +26,14 @@ class LegalGame extends Game
                 p21p22 = p21.vectorToTarget(p22)
                 if p11p21.magnitude() == 1 and p11p21.equal(p11p12) and p11p12.oppositeTo(p21p22)
                     @undo()
-                    fail("Illegal move.")
+                    fail("Illegal move according to the ko rule.")
         # 禁止“送二还一”，因其可能被用于耍赖（故意导致无法终局）
         do =>
             if lastButOneMove != null and
                     lastButOneMove.captures.length == 0 and
                     lastMove.captures.length == 2 and
-                    move.captures.length == 1
+                    move.captures.length == 1 and
+                    not lastMove.isSuicide and not move.isSuicide
                 p11 = lastButOneMove.position
                 p21 = lastMove.position
                 p22 = lastMove.captures[0]
@@ -44,7 +51,7 @@ class LegalGame extends Game
                         (p23.equal(p11) and p21p23.equal(p21p22.multiply(2)))
                     ) and p32.equal(p21)
                         @undo()
-                        fail("Illegal move.")
+                        fail("Illegal move. Send-2-return-1 is forbidden.")
     playMove: (position) ->
         lastMove = @getLastMove()
         lastButOneMove = if @moves.length < 2 then null else @moves[@moves.length - 2]

@@ -3,8 +3,12 @@
     <head>
         <title>围棋就是wei7</title>
         <meta name="description" content="在线下围棋，在线学围棋，在线看棋谱，无需安装任何软件。" />
-        <meta name="keywords" content="围棋, wei7, 对弈, 下棋, 弈城, QQ围棋, 棋牌, 棋谱, 打谱, 下围棋, 学围棋, 游戏, 棋魂, 佐为, 古力, 李昌镐, 聂卫平, 吴清源, 常昊, 李世石, 学习, tom, 网络" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="keywords"
+              content="围棋, wei7, 对弈, 下棋, 弈城, QQ围棋, 棋牌, 棋谱, 打谱, 下围棋,
+学围棋, 游戏, 棋魂, 佐为, 古力, 李昌镐, 聂卫平, 吴清源, 常昊, 李世石, 学习, tom, 网络" />
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <style type="text/css"><![CDATA[
             html {
                 font-family: Arial, 黑体;
@@ -29,6 +33,9 @@
             body>* {
                 position: absolute; /* 本来用fixed，但Chrome 17渲染有bug，且iOS中点击会有延迟 */
             }
+            #info1, #info2 {
+                overflow: hidden;
+            }
         ]]></style>
         <script type="text/javascript" src="client.js" />
         <script type="text/javascript"><![CDATA[
@@ -37,14 +44,17 @@
             _gaq.push(['_trackPageview']);
             (function() {
                 var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') +
+                        '.google-analytics.com/ga.js';
                 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
             })();
         ]]></script>
     </head>
     <body>
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="root" viewBox="-512 -512 1024 1024" />
+        <!-- 如果把info1和info2放在svg的前面（即呈现在svg的后面），则在Windows Store的IE 10中，
+             右键点空白处后无法调出地址栏，因为IE把svg当作图片。 -->
         <div id="info1" />
         <div id="info2" />
-        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="root" viewBox="-512 -512 1024 1024" />
     </body>
 </html>

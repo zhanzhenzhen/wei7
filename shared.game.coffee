@@ -2,10 +2,12 @@
 Game类实现了最底层的棋局。它既可以表示正在播放的棋谱中的棋，也可以表示正在对局中的棋。
 它的主要作用是使棋盘的状态符合围棋的基本规则。
     注意：Game不能储存变化（分支），也不控制UI的呈现，也没有打劫禁手，也无法判断胜负，
-    甚至不强制黑白双方交替下子（即一方可以连下两手或以上）。
-    这些功能由更加高阶的模块来提供。不过Game可以回退（即俗称的“悔棋”）。
+    也不禁止自杀，甚至不强制黑白双方交替下子（即一方可以连下两手或以上）。
+    这些功能如果需要，将由更加高阶的模块来提供。不过Game可以回退（即俗称的“悔棋”）。
+    为啥允许自杀，因为这样能使规则从数学上看起来更漂亮。
     为啥没有打劫禁手，因为当作为教程需要说明规则时，就需要一些违反规则的例子。
     不强制交替下子的原因也一样。而且有些搞笑的“勺子”棋谱恰恰就有这些情况出现。
+    总之，Game类禁止的下法应尽可能少。
 首先是一些要素：
 Color指“颜色”，即黑、白、空三者之一。
 Position指棋盘上一个点的坐标，含x,y属性。基本上就等于Point，但使用场合有些差异。
@@ -107,38 +109,37 @@ class Game extends ObjectWithEvent
         if pos == null
             @moves.push(move)
         else
-            if @_getBoardItem(move.position).color != Game.COLOR_EMPTY then fail("Illegal move.")
+            if @_getBoardItem(move.position).color != Game.COLOR_EMPTY
+                fail("Illegal move. This point already has a stone.")
             color = move.color
             oppositeColor = Game.getOpposite(color)
-            chainForMove = null
-            hasCaptures = false
             # *****(
             # 原理：
             # 由两个步骤组成。
             # 第一步，添加棋子。
-            # 第二步，处理吃子。在现阶段，程序仅能处理吃敌方的棋，还不能吃自己的（只有应氏规则允许）。
-            # 吃自己的棋的情形几乎不可能出现，所以现在没必要考虑。当然以后可能会考虑。
+            # 第二步，处理吃子。程序不但能处理吃敌方的棋，还能吃自己的（即自杀）。
             # 注意：本来为了追求性能，我没有用方法去实现数气的功能，而是动态更新属性。但后来发现实在难处理，
             # 便改用方法试了试，结果并不像想象的那样坏，那点性能损耗根本无法察觉。
             chainForMove = @_addStone(move)
             do =>
+                emptyChain = (chain) =>
+                    for m in chain.positions
+                        boardItem = @_getBoardItem(m)
+                        boardItem.color = Game.COLOR_EMPTY
+                        boardItem.chain = null
+                        move.captures.push(m)
+                    @_chains.splice(@_chains.indexOf(chain), 1)
                 chainsToUse = @_getAdjacentChains(pos, oppositeColor)
-                for i in [0...chainsToUse.length]
-                    chain = chainsToUse[i]
-                    if chain.getLiberties().length == 0
-                        for j in [0...chain.positions.length]
-                            item = chain.positions[j]
-                            boardItem = @_getBoardItem(item)
-                            boardItem.color = Game.COLOR_EMPTY
-                            boardItem.chain = null
-                            move.captures.push(item)
-                        @_chains.splice(@_chains.indexOf(chain), 1)
-                        hasCaptures = true
+                for m in chainsToUse
+                    if m.getLiberties().length == 0
+                        emptyChain(m)
+                if move.captures.length != 0
+                    move.isSuicide = false
+                else if chainForMove.getLiberties().length == 0
+                    emptyChain(chainForMove)
+                    move.isSuicide = true
             # )*****
             @moves.push(move)
-            if !hasCaptures and chainForMove != null and chainForMove.getLiberties().length == 0
-                @undo()
-                fail("Illegal move.")
     playMove: (move) ->
         @barePlayMove(move)
         @triggerEvent("AfterPlayMove")
