@@ -1,6 +1,25 @@
 httpModule = require("http")
 urlModule = require("url")
 fsModule = require("fs")
+mongoModule = require("mongodb")
+mongoURL = undefined
+do ->
+    if process.env.VCAP_SERVICES
+        env = JSON.parse(process.env.VCAP_SERVICES)
+        c = env["mongodb-1.8"][0]["credentials"]
+    else
+        c =
+            hostname: "localhost"
+            port: 27017
+            username: ""
+            password: ""
+            name: ""
+            db: "db"
+    mongoURL =
+        if c.username and c.password
+            "mongodb://#{c.username}:#{c.password}@#{c.hostname}:#{c.port}/#{c.db}"
+        else
+            "mongodb://#{c.hostname}:#{c.port}/#{c.db}"
 httpModule.createServer((request, response) ->
     checkError = (error) -> if error? then throw error
     try
@@ -45,6 +64,17 @@ httpModule.createServer((request, response) ->
                         response.writeHead(200, {"Content-Type": "application/xhtml+xml"})
                         response.end(data)
                     )
+                ###
+            when "/insertzzztest"
+                mongoModule.connect(mongoURL, (err, conn) ->
+                    conn.collection("things", (err, coll) ->
+                        coll.insert({time: {$date: 1362242631012}}, {safe: true}, (err) ->
+                            response.writeHead(200, {"Content-Type": "text/html"})
+                            response.end("<html><body>insert success</body></html>")
+                        )
+                    )
+                )
+                ###
             when "/wei7help.pdf"
                 fsModule.readFile("wei7help.pdf", (error, data) ->
                     checkError(error)
