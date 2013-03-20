@@ -89,7 +89,7 @@ applyHomePage = ->
     ui.board.addSquareButton("网", new Point(-320, 224), -> setScene("net"))
     ui.board.addSquareButton("闯", new Point(-160, 224), -> ui.board.init(19, -> setScene("rush")))
     ui.board.addSquareButton("自", new Point(0, 224), -> ui.board.init(19, -> setScene("free")))
-    ui.board.addSquareButton("学", new Point(160, 224), -> setScene("learn"))
+    ui.board.addSquareButton("学", new Point(160, 224), -> ui.board.init(19, -> setScene("learn")))
     ui.board.addSquareButton("谱", new Point(320, 224), -> setScene("records"))
     settingsButton = ui.board.addSquareButton("≡", new Point(-50, 364), ->
         ui.board.init(19, -> setScene("settings"))
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", ->
             document.body.addEventListener("touchend", preventDefaultEventHandler)
             document.body.addEventListener("touchmove", preventDefaultEventHandler)
         [ui.info1, ui.info2].forEach((m) -> setElementClickHandler(m, ->
-            if context.game != null
+            if context.scene.mode != "learn" and context.game != null
                 ui.board.showDialog()
         ))
         setElementHoldHandler(ui.boardInput, ->

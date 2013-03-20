@@ -24,3 +24,9 @@ isTouchDevice = do ->
         true
     catch e
         false
+remoteGet = (url, callback) ->
+    request = new XMLHttpRequest()
+    request.onload = ->
+        callback(JSON.parse(this.responseText))
+    request.open("GET", url)
+    request.send()

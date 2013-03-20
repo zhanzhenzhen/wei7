@@ -102,7 +102,9 @@ class Game extends ObjectWithEvent
         if @moves.length != 0 then fail("Already has moves.")
         @_board = @_createBoard()
         @_chains = []
-    barePlayMove: (move) ->
+    barePlayMove: (move) -> # move也可为一Point
+        if move == null or move instanceof Point
+            move = {color: @getNextColor(), position: move}
         move.previousState = @_cloneState()
         move.captures = []
         pos = move.position # pos如为null则代表pass

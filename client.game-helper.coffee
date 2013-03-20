@@ -25,11 +25,35 @@ class GameHelper
                 if legalGame.testMove(p) then return p
             return null
         success
-    @playMoveInBoard: (point) ->
+    @addStonesInBoard: (stones) ->
         game = context.game
         oldSnapshot = game.getBoardSnapshot()
-        game.playMove(point)
+        game.addStones(stones)
         newSnapshot = game.getBoardSnapshot()
         diff = Game.compareSnapshots(oldSnapshot, newSnapshot)
-        ui.board.updateStones(diff, true)
-        ui.board.setActiveStone(point, game.getLastMove().color)
+        ui.board.updateStones(diff, false)
+    @removeStonesInBoard: ->
+        game = context.game
+        oldSnapshot = game.getBoardSnapshot()
+        game.removeStones()
+        newSnapshot = game.getBoardSnapshot()
+        diff = Game.compareSnapshots(oldSnapshot, newSnapshot)
+        ui.board.updateStones(diff, false)
+    @playMoveInBoard: (move) ->
+        game = context.game
+        game.playMove(move)
+        movePlayed = game.getLastMove()
+        if movePlayed.position != null
+            ui.board.addStone(movePlayed.color, movePlayed.position, true)
+            for m in movePlayed.captures
+                ui.board.removeStone(m, true)
+        ui.board.setActiveStone(movePlayed.position, movePlayed.color)
+    @takebackMoveInBoard: (count) ->
+        game = context.game
+        oldSnapshot = game.getBoardSnapshot()
+        game.undo() for i in [0...count]
+        newSnapshot = game.getBoardSnapshot()
+        diff = Game.compareSnapshots(oldSnapshot, newSnapshot)
+        ui.board.updateStones(diff, false)
+        move = game.getLastMove()
+        if move != null then ui.board.setActiveStone(move.position, move.color)

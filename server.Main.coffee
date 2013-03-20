@@ -24,6 +24,10 @@ httpModule.createServer((request, response) ->
     checkError = (error) -> if error? then throw error
     try
         url = urlModule.parse(request.url, true)
+        if request.headers["host"] == "www.wei7.com"
+            response.writeHead(301, {"Location": "//wei7.com#{url.pathname}"})
+            response.end()
+            return
         switch url.pathname
             when "/"
                 userAgent = request.headers["user-agent"]
@@ -85,6 +89,12 @@ httpModule.createServer((request, response) ->
                 fsModule.readFile("wei7spec.pdf", (error, data) ->
                     checkError(error)
                     response.writeHead(200, {"Content-Type": "application/pdf"})
+                    response.end(data)
+                )
+            when "/tutorial.wei7"
+                fsModule.readFile("tutorial.wei7", (error, data) ->
+                    checkError(error)
+                    response.writeHead(200, {"Content-Type": "application/json"})
                     response.end(data)
                 )
             when "/client.js"

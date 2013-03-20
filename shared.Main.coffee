@@ -8,6 +8,58 @@ takeOutRandomItemInArray = (array) ->
     array.splice(index, 1)
     r
 jsonClone = (x) -> JSON.parse(JSON.stringify(x))
+class GameRecordWalker
+    constructor: (@record) ->
+        @position = {branchIndexes: [], stepIndex: undefined}
+        @stepCondition = -> true
+        @gotoFirstStep()
+    getCurrentBranch: ->
+        branch = @record.tree
+        for m in @position.branchIndexes
+            branch = branch.branches[m]
+        branch
+    findStepIndex: (isForward, start) ->
+        branch = @getCurrentBranch()
+        lowerBound = -1
+        upperBound = if branch.steps == undefined then -1 else branch.steps.length - 1
+        if isForward
+            start ?= lowerBound
+            end = upperBound
+        else
+            start ?= upperBound
+            end = lowerBound
+        for i in [start..end] by (if isForward then 1 else -1)
+            if i == -1
+                if branch.pre != undefined or branch.steps == undefined then return i
+            else
+                step = branch.steps[i]
+                if @stepCondition(step) then return i
+        fail("Step not found.")
+    gotoFirstStep: ->
+        @position.stepIndex = @findStepIndex(true)
+    gotoLastStep: ->
+        @position.stepIndex = @findStepIndex(false)
+    getNextStepIndex: ->
+        branch = @getCurrentBranch()
+        @findStepIndex(true, @position.stepIndex + 1)
+    getPreviousStepIndex: ->
+        branch = @getCurrentBranch()
+        @findStepIndex(false, @position.stepIndex - 1)
+    gotoNextStep: ->
+        @position.stepIndex = @getNextStepIndex()
+    gotoPreviousStep: ->
+        @position.stepIndex = @getPreviousStepIndex()
+    gotoChild: (branchIndex) ->
+        branch = @getCurrentBranch()
+        if not (branch.branches != undefined and 0 <= branchIndex < branch.branches.length)
+            fail("Branch does not exist.")
+        @position.branchIndexes.push(branchIndex)
+        @gotoFirstStep()
+    gotoParent: ->
+        if @position.branchIndexes.length == 0
+            fail("Already root.")
+        @position.branchIndexes.pop()
+        @gotoLastStep()
 class ObjectWithEvent
     constructor: ->
         @_eventList = {} # 用对象来模拟dictionary比用数组方便，但事件不能取会产生冲突的名称
