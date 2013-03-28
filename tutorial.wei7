@@ -122,6 +122,102 @@
           ],
           "comment": "这局棋是黑棋赢还是白棋赢呢？\n\n答案：\n黑方占据了棋盘左边的地域，白方占据了棋盘右边的地域。我们来数一下谁占得多。\n数下来，黑棋共占了190个点，白棋共占了171个点（注意双方所围的空点也计算在内）。黑棋比白棋多了19个点。我们就说，在中国规则下，黑棋赢了11.5目。\n“什么？等等……赢了11.5目？不是19个点吗？”嘿嘿，因为在围棋规则中，由于黑棋先走，而先走的一方是有一定优势的，所以最后算的时候，黑棋要减去7.5个点。19-7.5=11.5，所以赢的点数是11.5。按照专业的说法，赢的点数称为“目”，所以说黑棋赢了11.5目。\n而如果盘面上黑棋只比白棋多7个点，那么实际就是白棋反而赢了0.5目（大家拿黑棋可别下成这样哦，呵呵）。"
         }
+      },
+      {
+        "title": "征子",
+        "pre": {
+          "stones": [
+            {"color": 2, "point": {"x": 15, "y": 8}},
+            {"color": 2, "point": {"x": 15, "y": 9}},
+            {"color": 1, "point": {"x": 15, "y": 7}},
+            {"color": 1, "point": {"x": 14, "y": 8}},
+            {"color": 1, "point": {"x": 16, "y": 8}},
+            {"color": 1, "point": {"x": 16, "y": 9}},
+            {"color": 1, "point": {"x": 15, "y": 10}}
+          ],
+          "marks": [
+            {"point": {"x": 12, "y": 3}, "symbol": "a"}
+          ],
+          "comment": "现在，轮到白棋走。如果白棋走在别的地方，那黑棋只要走在a处，白棋就彻底完蛋。所以为了救出这2颗白子，白棋只能走在a位。那么其后的发展如何呢？"
+        },
+        "steps": [
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 14, "y": 9}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 13, "y": 9}}}, "comment": "现在，黑棋仍然是差一口气就可以吃掉白棋了。"},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 14, "y": 10}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 14, "y": 11}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 13, "y": 10}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 12, "y": 10}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 13, "y": 11}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 13, "y": 12}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 12, "y": 11}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 11, "y": 11}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 12, "y": 12}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 12, "y": 13}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 11, "y": 12}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 10, "y": 12}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 11, "y": 13}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 11, "y": 14}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 10, "y": 13}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 9, "y": 13}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 10, "y": 14}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 10, "y": 15}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 9, "y": 14}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 8, "y": 14}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 9, "y": 15}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 9, "y": 16}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 8, "y": 15}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 7, "y": 15}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 8, "y": 16}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 8, "y": 17}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 7, "y": 16}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 6, "y": 16}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 7, "y": 17}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 7, "y": 18}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 6, "y": 17}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 5, "y": 17}}}},
+          {"action": {"type": "move", "value": {"color": 2, "point": {"x": 6, "y": 18}}}},
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 5, "y": 18}}}, "comment": "终于，白棋全部被吃了。这种长途跋涉的吃子方法就叫做“征子”。"}
+        ]
+      },
+      {
+        "title": "打劫",
+        "pre": {
+          "stones": [
+            {"color": 2, "point": {"x": 14, "y": 7}},
+            {"color": 2, "point": {"x": 13, "y": 8}},
+            {"color": 2, "point": {"x": 15, "y": 8}},
+            {"color": 2, "point": {"x": 14, "y": 9}},
+            {"color": 1, "point": {"x": 15, "y": 7}},
+            {"color": 1, "point": {"x": 16, "y": 8}},
+            {"color": 1, "point": {"x": 15, "y": 9}}
+          ]
+        },
+        "steps": [
+          {"action": {"type": "move", "value": {"color": 1, "point": {"x": 14, "y": 8}}}, "comment": "黑棋现在吃掉了白棋。接下来白棋也想吃掉黑棋。"}
+        ],
+        "branches": [
+          {
+            "title": "禁止的下法",
+            "pre": {"comment": "让我们想一下，如果白棋可以吃黑棋，会怎么样。"},
+            "steps": [
+              {"action": {"type": "move", "value": {"color": 2, "point": {"x": 15, "y": 8}}}, "comment": "嗯，现在似乎又回到了一开始的局面了。然后呢？"},
+              {"action": {"type": "move", "value": {"color": 1, "point": {"x": 14, "y": 8}}}},
+              {"action": {"type": "move", "value": {"color": 2, "point": {"x": 15, "y": 8}}}, "comment": "这样下去，永远也下不完。因此，在围棋规则中，这样的下法是禁止的。"}
+            ]
+          },
+          {
+            "title": "符合规则的下法",
+            "pre": {"comment": "这时白棋必须在其他地方下一子，然后再下一步才能下在这里。"},
+            "steps": [
+              {"action": {"type": "move", "value": {"color": 2, "point": {"x": 5, "y": 5}}}},
+              {"action": {"type": "move", "value": {"color": 1, "point": {"x": 7, "y": 5}}}},
+              {"action": {"type": "move", "value": {"color": 2, "point": {"x": 15, "y": 8}}}},
+              {"action": {"type": "move", "value": {"color": 1, "point": {"x": 5, "y": 13}}}},
+              {"action": {"type": "move", "value": {"color": 2, "point": {"x": 7, "y": 13}}}},
+              {"action": {"type": "move", "value": {"color": 1, "point": {"x": 14, "y": 8}}}}
+            ]
+          }
+        ]
       }
     ]
   }

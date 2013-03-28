@@ -14,6 +14,14 @@ class GameHelper
                 "白中盘胜"
         else
             "结果未知"
+    @getMoveNumberText: (n) -> "第#{n + 1}手"
+    @getEvaluationText: (evaluation) ->
+        switch evaluation
+            when "bad" then "错误"
+            when "good" then "正确"
+            when "trick" then "圈套"
+            when "controversial" then "争议"
+            else ""
     @applyScoringAgent: (legalGame) ->
         score = legalGame.calculateScore()
         legalGame.setResult(score.winner, score.margin)
@@ -48,7 +56,7 @@ class GameHelper
             for m in movePlayed.captures
                 ui.board.removeStone(m, true)
         ui.board.setActiveStone(movePlayed.position, movePlayed.color)
-    @takebackMoveInBoard: (count) ->
+    @takebackMovesInBoard: (count) ->
         game = context.game
         oldSnapshot = game.getBoardSnapshot()
         game.undo() for i in [0...count]
@@ -56,4 +64,7 @@ class GameHelper
         diff = Game.compareSnapshots(oldSnapshot, newSnapshot)
         ui.board.updateStones(diff, false)
         move = game.getLastMove()
-        if move != null then ui.board.setActiveStone(move.position, move.color)
+        if move == null
+            ui.board.hideActiveStoneReminder()
+        else
+            ui.board.setActiveStone(move.position, move.color)

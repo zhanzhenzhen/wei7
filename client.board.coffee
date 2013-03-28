@@ -34,7 +34,7 @@ ui.board.make = (size) ->
     emptyElement(ui.info1)
     emptyElement(ui.info2)
     ui.board.hideDialog()
-    hideElement(ui.boardActiveStoneReminder)
+    ui.board.hideActiveStoneReminder()
     hideElement(ui.boardPendingMove)
     ui.board.isBlocked = true
     ui.board.size = size
@@ -147,6 +147,8 @@ ui.board.setActiveStone = (gamePoint, color) ->
         setElementRotate(reminder, 0)
         showElement(reminder)
         scaleAnimate(reminder, undefined, scale, syncTime, 200, 600, popTimingFunction)
+ui.board.hideActiveStoneReminder = ->
+    hideElement(ui.boardActiveStoneReminder)
 ui.board.updateStones = (diff, useAnimation) ->
     for i in [0...diff.length]
         item = diff[i]

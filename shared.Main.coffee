@@ -11,17 +11,26 @@ jsonClone = (x) -> JSON.parse(JSON.stringify(x))
 class GameRecordWalker
     constructor: (@record) ->
         @position = {branchIndexes: [], stepIndex: undefined}
-        @stepCondition = -> true
-        @gotoFirstStep()
+        @stopCondition = -> true
+        @gotoFirstStop()
     getCurrentBranch: ->
         branch = @record.tree
         for m in @position.branchIndexes
             branch = branch.branches[m]
         branch
+    getStepCount: ->
+        branch = @getCurrentBranch()
+        branch.steps?.length ? 0
     findStepIndex: (isForward, start) ->
+        hasBodyStop = => # BodyStop指在steps中的stop
+            try
+                @findStepIndex(true, 0)
+                true
+            catch e
+                false
         branch = @getCurrentBranch()
         lowerBound = -1
-        upperBound = if branch.steps == undefined then -1 else branch.steps.length - 1
+        upperBound = @getStepCount() - 1
         if isForward
             start ?= lowerBound
             end = upperBound
@@ -30,36 +39,39 @@ class GameRecordWalker
             end = lowerBound
         for i in [start..end] by (if isForward then 1 else -1)
             if i == -1
-                if branch.pre != undefined or branch.steps == undefined then return i
+                if branch.pre? or not hasBodyStop() then return i
             else
                 step = branch.steps[i]
-                if @stepCondition(step) then return i
+                if @stopCondition(step) then return i
         fail("Step not found.")
-    gotoFirstStep: ->
+    isLastStop: ->
+        branch = @getCurrentBranch()
+        @position.stepIndex == @findStepIndex(false, @getStepCount() - 1)
+    gotoFirstStop: ->
         @position.stepIndex = @findStepIndex(true)
-    gotoLastStep: ->
+    gotoLastStop: ->
         @position.stepIndex = @findStepIndex(false)
-    getNextStepIndex: ->
+    getNextStopStepIndex: ->
         branch = @getCurrentBranch()
         @findStepIndex(true, @position.stepIndex + 1)
-    getPreviousStepIndex: ->
+    getPreviousStopStepIndex: ->
         branch = @getCurrentBranch()
         @findStepIndex(false, @position.stepIndex - 1)
-    gotoNextStep: ->
-        @position.stepIndex = @getNextStepIndex()
-    gotoPreviousStep: ->
-        @position.stepIndex = @getPreviousStepIndex()
+    gotoNextStop: ->
+        @position.stepIndex = @getNextStopStepIndex()
+    gotoPreviousStop: ->
+        @position.stepIndex = @getPreviousStopStepIndex()
     gotoChild: (branchIndex) ->
         branch = @getCurrentBranch()
-        if not (branch.branches != undefined and 0 <= branchIndex < branch.branches.length)
+        if not (0 <= branchIndex < branch.branches?.length)
             fail("Branch does not exist.")
         @position.branchIndexes.push(branchIndex)
-        @gotoFirstStep()
+        @gotoFirstStop()
     gotoParent: ->
         if @position.branchIndexes.length == 0
-            fail("Already root.")
+            fail("Already at root.")
         @position.branchIndexes.pop()
-        @gotoLastStep()
+        @gotoLastStop()
 class ObjectWithEvent
     constructor: ->
         @_eventList = {} # 用对象来模拟dictionary比用数组方便，但事件不能取会产生冲突的名称
