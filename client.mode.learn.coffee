@@ -1,4 +1,8 @@
 sceneMaker["learn"] = ->
+    addGameButtons = ->
+        ui.board.addButton("返回", new Point(0, -80), -> ui.board.hideDialog())
+        ui.board.addButton("退出", new Point(0, 80), GoHome)
+    addGameButtons()
     remoteGet("/tutorial.wei7", (tutorial) ->
         elements = {}
         codifyElement(elements, """
@@ -7,12 +11,12 @@ sceneMaker["learn"] = ->
                 <tr><td style="padding: 0 6.25%; color: rgb(104,104,104);">
                     <div id="regularMenuItems" style="font-size: 1.3em;" />
                     <div style="font-size: 2em;">
-                        <span id="parentButton" style="width: 20%; display: inline-block;
-cursor: pointer;">&#x21B0;</span>
-                        <span id="backwardButton" style="width: 20%; display: inline-block;
-cursor: pointer;">&#x2190;</span>
-                        <span id="forwardButton" style="width: 20%; display: inline-block;
-cursor: pointer;">&#x2192;</span>
+                        <div id="parentButton" style="width: 20%; display: inline-block;
+            cursor: pointer;">&#x21B0;</div>
+                        <div id="backwardButton" style="width: 20%; display: inline-block;
+            cursor: pointer;">&#x2190;</div>
+                        <div id="forwardButton" style="width: 20%; display: inline-block;
+            cursor: pointer;">&#x2192;</div>
                     </div>
                     <div id="currentMoveNumberLabel" style="font-size: 1.3em; margin-top: 0.5em;" />
                 </td></tr>
@@ -23,22 +27,25 @@ cursor: pointer;">&#x2192;</span>
                     xmlns="http://www.w3.org/1999/xhtml">
                 <tr><td style="padding: 0 6.25%;">
                     <div id="evaluationLabel" style="text-align: center; font-size: 4em;
-color: rgb(0,128,0);" />
+            color: rgb(0,128,0);" />
                     <div id="commentLabel" style="font-size: 1em; color: rgb(104,104,104);" />
                 </td></tr>
             </table>
         """)
         ui.info1.appendChild(elements.info1Table)
         ui.info2.appendChild(elements.info2Table)
-        setElementClickHandler(elements.parentButton, ->
+        setElementClickHandler(elements.parentButton, (event) ->
+            event.stopPropagation()
             gotoParent()
             refresh()
         )
-        setElementClickHandler(elements.backwardButton, ->
+        setElementClickHandler(elements.backwardButton, (event) ->
+            event.stopPropagation()
             moveBackward()
             refresh()
         )
-        setElementClickHandler(elements.forwardButton, ->
+        setElementClickHandler(elements.forwardButton, (event) ->
+            event.stopPropagation()
             moveForward()
             refresh()
         )
@@ -51,13 +58,12 @@ color: rgb(0,128,0);" />
                     menuItem = parseElement("""
                         <div style="cursor: pointer; width: 100%; background-color: rgb(192,192,192);
                         margin: 0.5em 0; padding: 0.5em 0;"
-                                xmlns="http://www.w3.org/1999/xhtml">
-                            #{m.title}
-                        </div>
+                                xmlns="http://www.w3.org/1999/xhtml">#{m.title}</div>
                     """)
                     menuItem.branchIndex = i
                     do (menuItem) ->
-                        setElementClickHandler(menuItem, ->
+                        setElementClickHandler(menuItem, (event) ->
+                            event.stopPropagation()
                             gotoBranch(menuItem.branchIndex)
                             refresh()
                         )

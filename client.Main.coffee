@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", ->
             document.body.addEventListener("touchend", preventDefaultEventHandler)
             document.body.addEventListener("touchmove", preventDefaultEventHandler)
         [ui.info1, ui.info2].forEach((m) -> setElementClickHandler(m, ->
-            if context.scene.mode != "learn" and context.game != null
+            if context.game != null
                 ui.board.showDialog()
         ))
         setElementHoldHandler(ui.boardInput, ->
