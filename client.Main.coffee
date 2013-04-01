@@ -168,7 +168,6 @@ document.addEventListener("DOMContentLoaded", ->
     applyHomePage()
     setElementTranslate(ui.board, new Point(ui.root.positionLimit.x + 768, 0))
     ui.root.appendChild(ui.board)
-    translateAnimate(ui.board, undefined, new Point(0, 0), undefined, 750, 2000,
-            elasticTimingFunctionGenerator(30, 600, 5))
+    translateAnimate(ui.board, undefined, new Point(0, 0), undefined, 500, 1200, overflowTimingFunction)
     setDebugVariables()
 )

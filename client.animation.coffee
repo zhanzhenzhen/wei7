@@ -119,3 +119,4 @@ cubicBezierTimingFunctionGenerator = (p1, p2) ->
             fy(t)
 easeTimingFunction = cubicBezierTimingFunctionGenerator(new Point(0.25, 0.1), new Point(0.25, 1.0))
 popTimingFunction = cubicBezierTimingFunctionGenerator(new Point(0.25, 0.1), new Point(0.25, 2.0))
+overflowTimingFunction = cubicBezierTimingFunctionGenerator(new Point(0.25, 1.667), new Point(0.5, 1.0))

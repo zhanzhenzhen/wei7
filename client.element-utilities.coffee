@@ -79,8 +79,9 @@ isInputInElement = (element, event) ->
         true
     else
         false
-setElementClickHandler = (element, handler, threshold) ->
+setElementClickHandler = (element, handler, threshold, noPropagation) ->
     threshold ?= 2000
+    noPropagation ?= false
     startTime = null
     if isTouchDevice
         element.addEventListener("touchstart", (event) ->
@@ -97,6 +98,7 @@ setElementClickHandler = (element, handler, threshold) ->
             if startTime? and event.touches.length == 0 and
                     isInputInElement(element, event.changedTouches[0]) and
                     window.performance.now() - startTime < threshold
+                if noPropagation then event.stopPropagation()
                 handler(event.changedTouches[0])
             startTime = null
         )
@@ -114,6 +116,7 @@ setElementClickHandler = (element, handler, threshold) ->
         element.addEventListener("mouseup", (event) ->
             if startTime? and event.button == 0 and isInputInElement(element, event) and
                     window.performance.now() - startTime < threshold
+                if noPropagation then event.stopPropagation()
                 handler(event)
             startTime = null
         )

@@ -35,20 +35,17 @@ sceneMaker["learn"] = ->
         ui.info1.appendChild(elements.info1Table)
         ui.info2.appendChild(elements.info2Table)
         setElementClickHandler(elements.parentButton, (event) ->
-            event.stopPropagation()
             gotoParent()
             refresh()
-        )
+        , undefined, true)
         setElementClickHandler(elements.backwardButton, (event) ->
-            event.stopPropagation()
             moveBackward()
             refresh()
-        )
+        , undefined, true)
         setElementClickHandler(elements.forwardButton, (event) ->
-            event.stopPropagation()
             moveForward()
             refresh()
-        )
+        , undefined, true)
         refresh = ->
             walker = context.scene.walker
             branch = walker.getCurrentBranch()
@@ -63,10 +60,9 @@ sceneMaker["learn"] = ->
                     menuItem.branchIndex = i
                     do (menuItem) ->
                         setElementClickHandler(menuItem, (event) ->
-                            event.stopPropagation()
                             gotoBranch(menuItem.branchIndex)
                             refresh()
-                        )
+                        , undefined, true)
                     elements.regularMenuItems.appendChild(menuItem)
             elements.currentMoveNumberLabel.textContent =
                 GameHelper.getMoveNumberText(context.game.moves.length - 1)

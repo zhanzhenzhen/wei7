@@ -1,4 +1,5 @@
 .*
 *.coffee
 README.md
+LICENSE.md
 Cakefile
