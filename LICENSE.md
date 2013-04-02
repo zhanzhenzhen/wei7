@@ -1,4 +1,5 @@
 版权所有© 2013 詹臻臻
+
 Copyright© 2013 Zhenzhen Zhan
 
 本文中的“本软件”包括网页和脚本代码（例如.xhtml、.js、.coffee文件），包括文本文件（例如本文件），但不包括wei7spec.pdf（wei7格式规范）。所有者声明中所列之限制不适用于“wei7格式”。
