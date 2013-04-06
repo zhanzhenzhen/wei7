@@ -64,6 +64,12 @@ sceneMaker["learn"] = ->
                             refresh()
                         , undefined, true)
                     elements.regularMenuItems.appendChild(menuItem)
+            emptyElement(ui.boardMarks)
+            ui.board.addMark(m.symbol, new Point(m.point.x, m.point.y)) for m in \
+                    if walker.position.stepIndex == -1
+                        branch.pre?.marks ? []
+                    else
+                        branch.steps[walker.position.stepIndex].marks ? []
             elements.currentMoveNumberLabel.textContent =
                 GameHelper.getMoveNumberText(context.game.moves.length - 1)
             elements.evaluationLabel.textContent =

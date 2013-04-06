@@ -85,6 +85,12 @@ httpModule.createServer((request, response) ->
                     )
                 )
                 ###
+            when "/logo-16.ico"
+                fsModule.readFile("logo-16.ico", (error, data) ->
+                    checkError(error)
+                    response.writeHead(200, {"Content-Type": "image/x-icon"})
+                    response.end(data)
+                )
             when "/wei7help.pdf"
                 fsModule.readFile("wei7help.pdf", (error, data) ->
                     checkError(error)

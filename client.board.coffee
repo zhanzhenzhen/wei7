@@ -3,6 +3,7 @@ ui.board.gridlineWidthFactor = 0.057
 ui.board.borderWidthFactor = 0.133
 ui.board.starRadiusFactor = 0.114
 ui.board.stoneSizeFactor = 0.94
+ui.board.markFontSizeFactor = 0.8
 # callback在棋盘“消失”动画后“出现”动画前被调用，它可以包含对新棋盘将要显示的按钮、棋子等的绘画语句
 ui.board.init = (size, callback) ->
     hideElement(ui.info1)
@@ -156,6 +157,16 @@ ui.board.updateStones = (diff, useAnimation) ->
             ui.board.removeStone(item.position, useAnimation)
         else
             ui.board.addStone(item.color, item.position, useAnimation)
+ui.board.addMark = (symbol, gamePoint) ->
+    p = ui.board.mapPointToUI(gamePoint)
+    fontSize = ui.board.unitLength * ui.board.markFontSizeFactor
+    element = parseElement("""
+        <text x="0" y="#{if "a" <= symbol <= "z" then fontSize * 0.253 else fontSize * 0.357}"
+                fill="rgb(176,56,56)" font-size="#{fontSize}" text-anchor="middle"
+                transform="translate(#{p.x},#{p.y})" xmlns="http://www.w3.org/2000/svg" />
+    """)
+    element.textContent = symbol
+    ui.boardMarks.appendChild(element)
 ui.board.showDialog = (bgOpacity) ->
     ui.board.isInDialog = true
     hideElement(ui.info1)
