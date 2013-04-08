@@ -95,7 +95,7 @@ applyHomePage = ->
         ui.board.init(19, -> setScene("settings"))
     )
     setElementScale(settingsButton, 0.5)
-    helpButton = ui.board.addSquareButton("?", new Point(50, 364), -> window.open("wei7help.pdf"))
+    helpButton = ui.board.addSquareButton("?", new Point(50, 364), -> window.open("help.pdf"))
     setElementScale(helpButton, 0.5)
     context.game = null
     ui.board.showDialog(0)

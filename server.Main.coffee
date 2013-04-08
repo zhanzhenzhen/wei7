@@ -91,8 +91,8 @@ httpModule.createServer((request, response) ->
                     response.writeHead(200, {"Content-Type": "image/x-icon"})
                     response.end(data)
                 )
-            when "/wei7help.pdf"
-                fsModule.readFile("wei7help.pdf", (error, data) ->
+            when "/help.pdf"
+                fsModule.readFile("help.pdf", (error, data) ->
                     checkError(error)
                     response.writeHead(200, {"Content-Type": "application/pdf"})
                     response.end(data)
