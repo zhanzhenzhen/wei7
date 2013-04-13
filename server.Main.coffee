@@ -97,12 +97,6 @@ httpModule.createServer((request, response) ->
                     response.writeHead(200, {"Content-Type": "application/pdf"})
                     response.end(data)
                 )
-            when "/wei7spec.pdf"
-                fsModule.readFile("wei7spec.pdf", (error, data) ->
-                    checkError(error)
-                    response.writeHead(200, {"Content-Type": "application/pdf"})
-                    response.end(data)
-                )
             when "/tutorial.wei7"
                 fsModule.readFile("tutorial.wei7", (error, data) ->
                     checkError(error)
