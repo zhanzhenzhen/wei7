@@ -1,7 +1,7 @@
 wei7 (wei7.com)
 ====
 
-本项目的名称wei7并非是指wei7格式，而是指网站wei7.com。请务必先查看LICENSE.md以了解版权及许可方式。
+本项目的名称wei7并非是指wei7格式，而是指网站wei7.com。请务必先查看LICENSE.txt以了解版权及许可方式。
 
 必备条件
 ----
