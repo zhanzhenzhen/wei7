@@ -29,7 +29,7 @@ class Game extends ObjectWithEvent
     @COLOR_WHITE: 2
     constructor: (@size, @firstColor) ->
         super()
-        @secondColor = Game.getOpposite(firstColor)
+        @secondColor = Game.getOpposite(@firstColor)
         @moves = []
         @_board = @_createBoard()
         @_chains = []
