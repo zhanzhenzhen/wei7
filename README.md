@@ -8,11 +8,9 @@ wei7 (wei7.com)
 
 要成功生成这个应用，您的开发环境必须满足下列全部条件：
 
-- 已安装git。
-
 - 已安装node.js。
 
-- 在node.js中已安装CoffeeScript（注意：包名是coffee-script，必须使用npm命令的全局模式安装）。
+- 在node.js中已安装CoffeeScript 1.x（注意：包名是coffee-script，必须使用npm命令的全局模式安装）。
 
 怎样生成
 ----
